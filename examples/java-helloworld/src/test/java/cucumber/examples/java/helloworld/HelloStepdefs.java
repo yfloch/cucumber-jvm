@@ -24,4 +24,8 @@ public class HelloStepdefs {
     public void it_should_answer_with(String expectedHi) {
         assertEquals(expectedHi, hi);
     }
+
+    @Given("^I have navigated to the sign in page$")
+    public static void iHaveNavigatedToTheSignInPage() throws Exception {
+    }
 }
