@@ -1,5 +1,6 @@
 package cucumber.runtime;
 
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.snippets.Snippet;
 import cucumber.runtime.snippets.SnippetGenerator;
 import gherkin.I18n;
@@ -80,7 +81,7 @@ public class UndefinedStepsTrackerTest {
 
     private class TestBackend implements Backend {
         @Override
-        public void loadGlue(Glue glue, List<String> gluePaths) {
+        public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
             throw new UnsupportedOperationException();
         }
 

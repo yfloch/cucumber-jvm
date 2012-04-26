@@ -6,7 +6,7 @@ import cucumber.runtime.Glue;
 import cucumber.runtime.HookDefinition;
 import cucumber.runtime.StepDefinition;
 import cucumber.runtime.StepDefinitionMatch;
-import cucumber.runtime.java.incorrectlysubclassedstepdefs.SubclassesStepdefs;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.java.stepdefs.Stepdefs;
 import gherkin.I18n;
 import gherkin.formatter.model.Step;
@@ -21,12 +21,17 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 
 public class JavaBackendTest {
+    private LocalizedXStreams xstreams() {
+        return new LocalizedXStreams(Thread.currentThread().getContextClassLoader());
+    }
+
+
     @Test(expected = CucumberException.class)
     public void doesnt_like_path_like_glue() {
         ObjectFactory factory = new DefaultJavaObjectFactory();
         JavaBackend backend = new JavaBackend(factory);
         GlueStub world = new GlueStub();
-        backend.loadGlue(world, asList("cucumber/runtime/java/stepdefs"));
+        backend.loadGlue(world, asList("cucumber/runtime/java/stepdefs"), xstreams());
     }
 
     @Test
@@ -34,7 +39,7 @@ public class JavaBackendTest {
         ObjectFactory factory = new DefaultJavaObjectFactory();
         JavaBackend backend = new JavaBackend(factory);
         GlueStub world = new GlueStub();
-        backend.loadGlue(world, asList("cucumber.runtime.java.stepdefs"));
+        backend.loadGlue(world, asList("cucumber.runtime.java.stepdefs"), xstreams());
         backend.buildWorld();
         assertEquals(Stepdefs.class, factory.getInstance(Stepdefs.class).getClass());
     }
@@ -44,7 +49,7 @@ public class JavaBackendTest {
         ObjectFactory factory = new DefaultJavaObjectFactory();
         JavaBackend backend = new JavaBackend(factory);
         GlueStub world = new GlueStub();
-        backend.loadGlue(world, asList("cucumber.runtime.java.stepdefs", "cucumber.runtime.java.incorrectlysubclassedstepdefs"));
+        backend.loadGlue(world, asList("cucumber.runtime.java.stepdefs", "cucumber.runtime.java.incorrectlysubclassedstepdefs"), xstreams());
     }
 
     private class GlueStub implements Glue {

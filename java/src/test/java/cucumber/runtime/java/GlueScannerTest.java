@@ -14,20 +14,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-public class ClasspathMethodScannerTest {
+public class GlueScannerTest {
 
     @Test
     public void loadGlue_registers_the_methods_declaring_class_in_the_object_factory() throws NoSuchMethodException {
         ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader());
-        ClasspathMethodScanner classpathMethodScanner = new ClasspathMethodScanner(resourceLoader);
+        GlueScanner glueScanner = new GlueScanner(resourceLoader);
 
         ObjectFactory factory = Mockito.mock(ObjectFactory.class);
         Glue world = Mockito.mock(Glue.class);
         JavaBackend backend = new JavaBackend(factory);
         Whitebox.setInternalState(backend, "glue", world);
 
-        // this delegates to classpathMethodScanner.scan which we test
-        classpathMethodScanner.scan(backend, BaseStepDefs.class.getMethod("m"), BaseStepDefs.class);
+        // this delegates to glueScanner.scan which we test
+        glueScanner.scan(backend, BaseStepDefs.class.getMethod("m"), BaseStepDefs.class);
 
         verify(factory, times(1)).addClass(BaseStepDefs.class);
         verifyNoMoreInteractions(factory);
@@ -40,7 +40,7 @@ public class ClasspathMethodScannerTest {
             backend.loadGlue(null, BaseStepDefs.class.getMethod("m"), Stepdefs2.class);
             fail();
         } catch (CucumberException e) {
-            assertEquals("You're not allowed to extend classes that define Step Definitions or hooks. class cucumber.runtime.java.ClasspathMethodScannerTest$Stepdefs2 extends class cucumber.runtime.java.ClasspathMethodScannerTest$BaseStepDefs", e.getMessage());
+            assertEquals("You're not allowed to extend classes that define Step Definitions or hooks. class cucumber.runtime.java.GlueScannerTest$Stepdefs2 extends class cucumber.runtime.java.GlueScannerTest$BaseStepDefs", e.getMessage());
         }
     }
 
@@ -51,7 +51,7 @@ public class ClasspathMethodScannerTest {
             backend.loadGlue(null, BaseStepDefs.class.getMethod("m"), String.class);
             fail();
         } catch (CucumberException e) {
-            assertEquals("class cucumber.runtime.java.ClasspathMethodScannerTest$BaseStepDefs isn't assignable from class java.lang.String", e.getMessage());
+            assertEquals("class cucumber.runtime.java.GlueScannerTest$BaseStepDefs isn't assignable from class java.lang.String", e.getMessage());
         }
     }
 

@@ -46,7 +46,7 @@
 (defn- -init [resource-loader]
   [[] (atom {:resource-loader resource-loader})])
 
-(defn -loadGlue [cljb a-glue glue-paths]
+(defn -loadGlue [cljb a-glue glue-paths, localized-xstreams]
   (reset! glue a-glue)
   (doseq [path glue-paths
           resource (.resources (:resource-loader @(.state cljb)) path ".clj")]

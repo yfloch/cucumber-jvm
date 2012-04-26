@@ -39,12 +39,12 @@ public class Runtime implements UnreportedStepExecutor {
     private final List<Throwable> errors = new ArrayList<Throwable>();
     private final Collection<? extends Backend> backends;
     private final ResourceLoader resourceLoader;
+    private final ClassLoader classLoader;
 
     //TODO: These are really state machine variables, and I'm not sure the runtime is the best place for this state machine
     //They really should be created each time a scenario is run, not in here
     private boolean skipNextStep = false;
     private ScenarioResultImpl scenarioResult = null;
-    private ClassLoader classLoader;
 
     public Runtime(ResourceLoader resourceLoader, ClassLoader classLoader, RuntimeOptions runtimeOptions) {
         this(resourceLoader, classLoader, loadBackends(resourceLoader, classLoader), runtimeOptions);
@@ -57,10 +57,11 @@ public class Runtime implements UnreportedStepExecutor {
             throw new CucumberException("No backends were found. Please make sure you have a backend module on your CLASSPATH.");
         }
         this.backends = backends;
-        glue = new RuntimeGlue(undefinedStepsTracker, new LocalizedXStreams(classLoader));
+        LocalizedXStreams localizedXStreams = new LocalizedXStreams(classLoader);
+        this.glue = new RuntimeGlue(undefinedStepsTracker, localizedXStreams);
 
         for (Backend backend : backends) {
-            backend.loadGlue(glue, runtimeOptions.glue);
+            backend.loadGlue(glue, runtimeOptions.glue, localizedXStreams);
             backend.setUnreportedStepExecutor(this);
         }
         this.runtimeOptions = runtimeOptions;
@@ -127,32 +128,25 @@ public class Runtime implements UnreportedStepExecutor {
         return result;
     }
 
-    private boolean hasUndefinedOrPendingStepsAndIsStrict()
-    {
+    private boolean hasUndefinedOrPendingStepsAndIsStrict() {
         return runtimeOptions.strict && hasUndefinedOrPendingSteps();
     }
 
-    private boolean hasUndefinedOrPendingSteps()
-    {
+    private boolean hasUndefinedOrPendingSteps() {
         return hasUndefinedSteps() || hasPendingSteps();
     }
 
-    private boolean hasUndefinedSteps()
-    {
+    private boolean hasUndefinedSteps() {
         return undefinedStepsTracker.hasUndefinedSteps();
     }
 
-    private boolean hasPendingSteps()
-    {
+    private boolean hasPendingSteps() {
         return !errors.isEmpty() && !hasErrors();
     }
 
-    private boolean hasErrors()
-    {
-        for (Throwable error : errors)
-        {
-            if (!(error instanceof PendingException))
-            {
+    private boolean hasErrors() {
+        for (Throwable error : errors) {
+            if (!(error instanceof PendingException)) {
                 return true;
             }
         }

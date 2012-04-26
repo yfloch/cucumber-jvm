@@ -1,6 +1,7 @@
 package cucumber.runtime.converters;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.ConverterRegistry;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class LocalizedXStreams {
     private final Map<I18n, LocalizedXStream> xStreams = new HashMap<I18n, LocalizedXStream>();
     private final ClassLoader classLoader;
+    private final List<SingleValueConverter> converters = new ArrayList<SingleValueConverter>();
 
     public LocalizedXStreams(ClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -30,14 +32,22 @@ public class LocalizedXStreams {
         return xStream;
     }
 
+    /**
+     * Registers a custom converter.
+     * @param converter
+     */
+    public void registerConverter(SingleValueConverter converter) {
+        converters.add(converter);
+    }
+
     private LocalizedXStream newXStream(Locale locale) {
         DefaultConverterLookup lookup = new DefaultConverterLookup();
         return new LocalizedXStream(classLoader, lookup, lookup, locale);
     }
 
-    public static class LocalizedXStream extends XStream {
+    public class LocalizedXStream extends XStream {
         private final Locale locale;
-        private static List<TimeConverter> timeConverters = new ArrayList<TimeConverter>();
+        private final List<TimeConverter> timeConverters = new ArrayList<TimeConverter>();
 
         public LocalizedXStream(ClassLoader classLoader, ConverterLookup converterLookup, ConverterRegistry converterRegistry, Locale locale) {
             super(null, null, classLoader, null, converterLookup, converterRegistry);
@@ -54,6 +64,10 @@ public class LocalizedXStreams {
             register(converterRegistry, new FloatConverter(locale));
             register(converterRegistry, new IntegerConverter(locale));
             register(converterRegistry, new LongConverter(locale));
+
+            for (SingleValueConverter converter : converters) {
+                registerConverter(converter);
+            }
         }
 
         private void register(ConverterRegistry lookup, SingleValueConverter converter) {

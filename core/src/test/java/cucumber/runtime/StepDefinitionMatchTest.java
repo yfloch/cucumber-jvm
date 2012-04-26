@@ -109,7 +109,11 @@ public class StepDefinitionMatchTest {
                             "Try writing your own converter:\n" +
                             "\n" +
                             "@com.thoughtworks.xstream.annotations.XStreamConverter(ThangConverter.class)\n" +
-                            "public class Thang {}\n",
+                            "public class Thang {}\n" +
+                            "\n" +
+                            "Alternatively, leave out the annotation and\n" +
+                            "register it in your own implementation of\n" +
+                            "ObjectMapper.\n",
                     expected.getMessage()
             );
         }

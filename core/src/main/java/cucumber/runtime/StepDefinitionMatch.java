@@ -101,7 +101,11 @@ public class StepDefinitionMatch extends Match {
                                     "Try writing your own converter:\n" +
                                     "\n" +
                                     "@%s(%sConverter.class)\n" +
-                                    "public class %s {}\n",
+                                    "public class %s {}\n" +
+                                    "\n" +
+                                    "Alternatively, leave out the annotation and\n" +
+                                    "register it in your own implementation of\n" +
+                                    "ObjectMapper.\n",
                             a.getVal(),
                             parameterType.getParameterClass().getName(),
                             XStreamConverter.class.getName(),

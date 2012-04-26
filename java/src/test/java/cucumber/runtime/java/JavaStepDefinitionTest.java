@@ -7,6 +7,7 @@ import cucumber.runtime.DuplicateStepDefinitionException;
 import cucumber.runtime.Glue;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.RuntimeOptions;
+import cucumber.runtime.converters.LocalizedXStreams;
 import gherkin.I18n;
 import gherkin.formatter.Reporter;
 import gherkin.formatter.model.Comment;
@@ -55,7 +56,7 @@ public class JavaStepDefinitionTest {
 
     @org.junit.Before
     public void loadNoGlue() {
-        backend.loadGlue(glue, Collections.<String>emptyList());
+        backend.loadGlue(glue, Collections.<String>emptyList(), new LocalizedXStreams(classLoader));
     }
 
     @Test(expected = DuplicateStepDefinitionException.class)

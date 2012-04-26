@@ -11,6 +11,7 @@ import cucumber.runtime.CucumberException;
 import cucumber.runtime.Glue;
 import cucumber.runtime.UnreportedStepExecutor;
 import cucumber.runtime.Utils;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.snippets.SnippetGenerator;
 import gherkin.formatter.model.Step;
 
@@ -23,18 +24,18 @@ public class JavaBackend implements Backend {
     private final SnippetGenerator snippetGenerator = new SnippetGenerator(new JavaSnippet());
     private final ObjectFactory objectFactory;
     private final ClasspathResourceLoader classpathResourceLoader;
-    private final ClasspathMethodScanner classpathMethodScanner;
+    private final GlueScanner glueScanner;
     private Glue glue;
 
     public JavaBackend(ResourceLoader ignored) {
         classpathResourceLoader = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader());
-        classpathMethodScanner = new ClasspathMethodScanner(classpathResourceLoader);
+        glueScanner = new GlueScanner(classpathResourceLoader);
         objectFactory = loadObjectFactory();
     }
 
     public JavaBackend(ObjectFactory objectFactory) {
         classpathResourceLoader = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader());
-        classpathMethodScanner = new ClasspathMethodScanner(classpathResourceLoader);
+        glueScanner = new GlueScanner(classpathResourceLoader);
         this.objectFactory = objectFactory;
     }
 
@@ -53,9 +54,10 @@ public class JavaBackend implements Backend {
     }
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
+    public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
         this.glue = glue;
-        classpathMethodScanner.scan(this, gluePaths);
+        glueScanner.configureXStream(localizedXStreams, gluePaths);
+        glueScanner.scan(this, gluePaths);
     }
 
     /**
@@ -68,7 +70,7 @@ public class JavaBackend implements Backend {
      */
     public void loadGlue(Glue glue, Method method, Class<?> glueCodeClass) {
         this.glue = glue;
-        classpathMethodScanner.scan(this, method, glueCodeClass);
+        glueScanner.scan(this, method, glueCodeClass);
     }
 
     @Override

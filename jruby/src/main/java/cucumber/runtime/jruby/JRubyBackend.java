@@ -3,6 +3,7 @@ package cucumber.runtime.jruby;
 import cucumber.io.Resource;
 import cucumber.io.ResourceLoader;
 import cucumber.runtime.*;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.snippets.SnippetGenerator;
 import cucumber.table.DataTable;
 import gherkin.I18n;
@@ -52,7 +53,7 @@ public class JRubyBackend implements Backend {
     }
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
+    public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
         this.glue = glue;
         for (String gluePath : gluePaths) {
             for (Resource resource : resourceLoader.resources(packagePath(gluePath), ".rb")) {

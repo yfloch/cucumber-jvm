@@ -8,6 +8,7 @@ import _root_.java.lang.reflect.Modifier
 import snippets.SnippetGenerator
 import io.ResourceLoader
 import io.ClasspathResourceLoader
+import converters.LocalizedXStreams
 
 import scala.collection.JavaConversions._
 
@@ -31,7 +32,7 @@ class ScalaBackend(ignore:ResourceLoader) extends Backend {
     //I don't believe scala has to do anything to clean out it's world
   }
 
-  def loadGlue(glue: Glue,  gluePaths: JList[String]) {
+  def loadGlue(glue: Glue, gluePaths: JList[String], localizedXStreams: LocalizedXStreams) {
     val cl = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader)
     val dslClasses =  gluePaths flatMap {cl.getDescendants(classOf[ScalaDsl], _) } filter { cls =>
       try {

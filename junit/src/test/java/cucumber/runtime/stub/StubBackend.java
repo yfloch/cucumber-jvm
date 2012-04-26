@@ -4,6 +4,7 @@ import cucumber.io.ResourceLoader;
 import cucumber.runtime.Backend;
 import cucumber.runtime.Glue;
 import cucumber.runtime.UnreportedStepExecutor;
+import cucumber.runtime.converters.LocalizedXStreams;
 import gherkin.formatter.model.Step;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class StubBackend implements Backend {
     }
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
+    public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
     }
 
     @Override

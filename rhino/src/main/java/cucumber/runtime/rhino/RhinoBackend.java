@@ -6,6 +6,7 @@ import cucumber.runtime.Backend;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Glue;
 import cucumber.runtime.UnreportedStepExecutor;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.javascript.JavaScriptSnippet;
 import cucumber.runtime.snippets.SnippetGenerator;
 import gherkin.formatter.model.Step;
@@ -41,7 +42,7 @@ public class RhinoBackend implements Backend {
     }
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
+    public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
         this.glue = glue;
         this.gluePaths = gluePaths;
         for (String gluePath : gluePaths) {

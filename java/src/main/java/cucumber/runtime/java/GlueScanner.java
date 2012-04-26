@@ -6,19 +6,20 @@ import cucumber.annotation.Order;
 import cucumber.io.ClasspathResourceLoader;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Utils;
+import cucumber.runtime.converters.LocalizedXStreams;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 
-class ClasspathMethodScanner {
+class GlueScanner {
 
-    private final ClasspathResourceLoader resourceLoader;
+    private final ClasspathResourceLoader classpathResourceLoader;
     private final Collection<Class<? extends Annotation>> cucumberAnnotationClasses;
 
-    public ClasspathMethodScanner(ClasspathResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
+    public GlueScanner(ClasspathResourceLoader classpathResourceLoader) {
+        this.classpathResourceLoader = classpathResourceLoader;
         cucumberAnnotationClasses = findCucumberAnnotationClasses();
     }
 
@@ -30,11 +31,11 @@ class ClasspathMethodScanner {
      */
     public void scan(JavaBackend javaBackend, List<String> gluePaths) {
         for (String gluePath : gluePaths) {
-            if(gluePath.contains("/") || gluePath.contains("\\")) {
+            if (gluePath.contains("/") || gluePath.contains("\\")) {
                 throw new CucumberException("Java glue must be a Java package name - not a path: " + gluePath);
             }
             // We can be fairly confident that gluePath is a package name at this point
-            for (Class<?> glueCodeClass : resourceLoader.getDescendants(Object.class, gluePath)) {
+            for (Class<?> glueCodeClass : classpathResourceLoader.getDescendants(Object.class, gluePath)) {
                 while (glueCodeClass != null && glueCodeClass != Object.class && !Utils.isInstantiable(glueCodeClass)) {
                     // those can't be instantiated without container class present.
                     glueCodeClass = glueCodeClass.getSuperclass();
@@ -48,21 +49,33 @@ class ClasspathMethodScanner {
         }
     }
 
+    public void configureXStream(LocalizedXStreams localizedXStreams, List<String> gluePaths) {
+        for (String gluePath : gluePaths) {
+            if (gluePath.contains("/") || gluePath.contains("\\")) {
+                throw new CucumberException("Java glue must be a Java package name - not a path: " + gluePath);
+            }
+            // We can be fairly confident that gluePath is a package name at this point
+            for (ObjectMapper objectMapper : classpathResourceLoader.instantiateSubclasses(ObjectMapper.class, gluePath, new Class[0], new Object[0])) {
+                objectMapper.configure(localizedXStreams);
+            }
+        }
+    }
+
     /**
      * Registers step definitions and hooks.
      *
-     * @param javaBackend the backend where stepdefs and hooks will be registered
-     * @param method      a candidate for being a stepdef or hook
+     * @param javaBackend   the backend where stepdefs and hooks will be registered
+     * @param method        a candidate for being a stepdef or hook
      * @param glueCodeClass
      */
     public void scan(JavaBackend javaBackend, Method method, Class<?> glueCodeClass) {
         for (Class<? extends Annotation> cucumberAnnotationClass : cucumberAnnotationClasses) {
             Annotation annotation = method.getAnnotation(cucumberAnnotationClass);
             if (annotation != null && !annotation.annotationType().equals(Order.class)) {
-                if(!method.getDeclaringClass().isAssignableFrom(glueCodeClass)) {
+                if (!method.getDeclaringClass().isAssignableFrom(glueCodeClass)) {
                     throw new CucumberException(String.format("%s isn't assignable from %s", method.getDeclaringClass(), glueCodeClass));
                 }
-                if(!glueCodeClass.equals(method.getDeclaringClass())) {
+                if (!glueCodeClass.equals(method.getDeclaringClass())) {
                     throw new CucumberException(String.format("You're not allowed to extend classes that define Step Definitions or hooks. %s extends %s", glueCodeClass, method.getDeclaringClass()));
                 }
                 if (isHookAnnotation(annotation)) {
@@ -75,7 +88,7 @@ class ClasspathMethodScanner {
     }
 
     private Collection<Class<? extends Annotation>> findCucumberAnnotationClasses() {
-        return resourceLoader.getAnnotations("cucumber.annotation");
+        return classpathResourceLoader.getAnnotations("cucumber.annotation");
     }
 
     private boolean isHookAnnotation(Annotation annotation) {

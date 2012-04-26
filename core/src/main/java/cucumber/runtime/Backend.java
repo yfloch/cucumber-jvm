@@ -1,5 +1,6 @@
 package cucumber.runtime;
 
+import cucumber.runtime.converters.LocalizedXStreams;
 import gherkin.formatter.model.Step;
 
 import java.util.List;
@@ -7,8 +8,12 @@ import java.util.List;
 public interface Backend {
     /**
      * Invoked once before all features. This is where stepdefs and hooks should be loaded.
+     *
+     * @param glue      where hooks and stepdefs should be registered
+     * @param gluePaths where stepdefs and hooks can be loaded from. Typically a path or a package name
+     * @param localizedXStreams
      */
-    void loadGlue(Glue glue, List<String> gluePaths);
+    void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams);
 
     /**
      * invoked once, handing the backend a reference to a step executor

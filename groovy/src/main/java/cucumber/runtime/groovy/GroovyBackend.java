@@ -7,6 +7,7 @@ import cucumber.runtime.Backend;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Glue;
 import cucumber.runtime.UnreportedStepExecutor;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.snippets.SnippetGenerator;
 import gherkin.TagExpression;
 import gherkin.formatter.model.Step;
@@ -51,7 +52,7 @@ public class GroovyBackend implements Backend {
     }
 
     @Override
-    public void loadGlue(Glue glue, List<String> gluePaths) {
+    public void loadGlue(Glue glue, List<String> gluePaths, LocalizedXStreams localizedXStreams) {
         this.glue = glue;
         final Binding context = shell.getContext();
 
