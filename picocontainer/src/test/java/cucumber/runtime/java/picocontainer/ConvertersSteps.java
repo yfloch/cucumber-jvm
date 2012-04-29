@@ -3,7 +3,6 @@ package cucumber.runtime.java.picocontainer;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.converters.extended.ToStringConverter;
 import cucumber.annotation.en.Given;
-import junit.framework.Assert;
 
 import java.util.List;
 
@@ -14,82 +13,82 @@ import static junit.framework.Assert.assertEquals;
  */
 public class ConvertersSteps {
 
-    @Given("^I have some foo named \"([^\"]*)\"$")
-    public void I_have_some_foo_named(Foo foo) {
-        assertEquals("MyFoo", foo.getName());
+    @Given("^I have some fruit named \"([^\"]*)\"$")
+    public void I_have_some_fruit_named(Fruit fruit) {
+        assertEquals("Citrus", fruit.getName());
     }
 
-    @Given("^I have some bar named \"([^\"]*)\"$")
-    public void I_have_some_bar_named(BarSubclass bar) {
-        assertEquals("mybar", bar.getName());
+    @Given("^I have some lower case person named \"([^\"]*)\"$")
+    public void I_have_some_lower_case_person_named(LowercasePerson lowercasePerson) {
+        assertEquals("charlie", lowercasePerson.getName());
     }
 
-    @Given("^I have some baz named \"([^\"]*)\"$")
-    public void I_have_some_baz_named(BazHolder bazHolder) {
-        assertEquals("MyBaz", bazHolder.getBaz().getName());
+    @Given("^I have some city holder named \"([^\"]*)\"$")
+    public void I_have_some_city_holder_named(CityHolder cityHolder) {
+        assertEquals("Chicago", cityHolder.getCity().getName());
     }
 
     @Given("^I have some stuff in a data table:$")
-    public void I_have_some_stuff_in_a_data_table(List<Stuff> stuffs) {
-        for (Stuff stuff : stuffs) {
-            assertEquals("myfoo2", stuff.foo.getName());
-            assertEquals("MyBar2", stuff.bar.getName());
-            assertEquals("mybaz2", stuff.baz.getName());
+    public void I_have_some_stuff_in_a_data_table(List<LowerCaseFruitPersonLowerCaseCity> lowerCaseFruitPersonLowerCaseCities) {
+        for (LowerCaseFruitPersonLowerCaseCity lowerCaseFruitPersonLowerCaseCity : lowerCaseFruitPersonLowerCaseCities) {
+            assertEquals("banana", lowerCaseFruitPersonLowerCaseCity.lowercaseFruit.getName());
+            assertEquals("Joan", lowerCaseFruitPersonLowerCaseCity.person.getName());
+            assertEquals("london", lowerCaseFruitPersonLowerCaseCity.lowercaseCity.getName());
         }
     }
 
-    public static class Stuff {
+    public static class LowerCaseFruitPersonLowerCaseCity {
         @XStreamConverter(LowerCaseToStringConverter.class)
-        public Foo foo;
+        public Fruit lowercaseFruit;
         @XStreamConverter(ToStringConverter.class)
-        public Bar bar;
+        public Person person;
         @XStreamConverter(LowerCaseToStringConverter.class)
-        public Baz baz;
+        public City lowercaseCity;
     }
 
     @XStreamConverter(LowerCaseToStringConverter.class)
-    public static class BarSubclass extends Bar {
-        public BarSubclass(String name) {
+    public static class LowercasePerson extends Person {
+        public LowercasePerson(String name) {
             super(name);
         }
     }
 
     @XStreamConverter(ToStringConverter.class)
-    public static class BazHolder {
-        private Baz baz;
+    public static class CityHolder {
+        private City city;
 
-        public BazHolder(String name) {
-            this.baz = new Baz(name);
+        public CityHolder(String name) {
+            this.city = new City(name);
         }
 
-        public Baz getBaz() {
-            return baz;
+        public City getCity() {
+            return city;
         }
     }
 
     @XStreamConverter(ToStringConverter.class)
-    public static class Foo extends Thing {
-        public Foo(String name) {
+    public static class Fruit extends Named {
+        public Fruit(String name) {
             super(name);
         }
     }
 
-    public static class Bar extends Thing {
-        public Bar(String name) {
+    public static class Person extends Named {
+        public Person(String name) {
             super(name);
         }
     }
 
-    public static final class Baz extends Thing {
-        public Baz(String name) {
+    public static final class City extends Named {
+        public City(String name) {
             super(name);
         }
     }
 
-    public static class Thing {
+    private static abstract class Named {
         private String name;
 
-        public Thing(String name) {
+        public Named(String name) {
             this.name = name;
         }
 
