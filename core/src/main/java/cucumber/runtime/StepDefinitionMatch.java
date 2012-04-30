@@ -83,8 +83,6 @@ public class StepDefinitionMatch extends Match {
             TimeConverter timeConverter = null;
             ParameterType parameterType = parameterTypes.get(n);
 
-            xStream.processAnnotations(parameterType.getParameterClass());
-
             if (parameterType.getDateFormat() != null) {
                 timeConverter = TimeConverter.getInstance(parameterType, locale);
                 timeConverter.setOnlyFormat(parameterType.getDateFormat(), locale);
@@ -105,7 +103,7 @@ public class StepDefinitionMatch extends Match {
                                     "\n" +
                                     "Alternatively, leave out the annotation and\n" +
                                     "register it in your own implementation of\n" +
-                                    "ObjectMapper.\n",
+                                    "CucumberConfiguration.\n",
                             a.getVal(),
                             parameterType.getParameterClass().getName(),
                             XStreamConverter.class.getName(),

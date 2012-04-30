@@ -55,8 +55,12 @@ class GlueScanner {
                 throw new CucumberException("Java glue must be a Java package name - not a path: " + gluePath);
             }
             // We can be fairly confident that gluePath is a package name at this point
-            for (ObjectMapper objectMapper : classpathResourceLoader.instantiateSubclasses(ObjectMapper.class, gluePath, new Class[0], new Object[0])) {
-                objectMapper.configure(localizedXStreams);
+            for (CucumberConfig cucumberConfig : classpathResourceLoader.instantiateSubclasses(CucumberConfig.class, gluePath, new Class[0], new Object[0])) {
+                try {
+                    cucumberConfig.configure(localizedXStreams);
+                } catch (Exception e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
     }

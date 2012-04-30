@@ -1,7 +1,7 @@
 package cucumber.runtime.java.picocontainer;
 
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.converters.extended.ToStringConverter;
+import cucumber.runtime.xstream.annotations.XStreamConverter;
+import cucumber.runtime.xstream.converters.extended.ToStringConverter;
 import cucumber.annotation.en.Given;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 
 /**
- * tests various ways of mix and matching xstream converters on plain steps and data tables
+ * Tests various ways of mixing and matching xstream converters on plain steps and data tables
  */
 public class ConvertersSteps {
 
@@ -19,8 +19,8 @@ public class ConvertersSteps {
     }
 
     @Given("^I have some lower case person named \"([^\"]*)\"$")
-    public void I_have_some_lower_case_person_named(LowercasePerson lowercasePerson) {
-        assertEquals("charlie", lowercasePerson.getName());
+    public void I_have_some_lower_case_person_named(LowerCasePerson lowerCasePerson) {
+        assertEquals("charlie", lowerCasePerson.getName());
     }
 
     @Given("^I have some city holder named \"([^\"]*)\"$")
@@ -47,8 +47,8 @@ public class ConvertersSteps {
     }
 
     @XStreamConverter(LowerCaseToStringConverter.class)
-    public static class LowercasePerson extends Person {
-        public LowercasePerson(String name) {
+    public static class LowerCasePerson extends Person {
+        public LowerCasePerson(String name) {
             super(name);
         }
     }

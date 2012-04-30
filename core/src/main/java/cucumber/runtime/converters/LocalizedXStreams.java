@@ -1,7 +1,6 @@
 package cucumber.runtime.converters;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.ConverterRegistry;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -34,6 +33,7 @@ public class LocalizedXStreams {
 
     /**
      * Registers a custom converter.
+     *
      * @param converter
      */
     public void registerConverter(SingleValueConverter converter) {
@@ -58,12 +58,13 @@ public class LocalizedXStreams {
             register(converterRegistry, new BigDecimalConverter(locale));
             register(converterRegistry, new BigIntegerConverter(locale));
             register(converterRegistry, new ByteConverter(locale));
-            register(converterRegistry, new DateConverter(locale));
             register(converterRegistry, new CalendarConverter(locale));
+            register(converterRegistry, new DateConverter(locale));
             register(converterRegistry, new DoubleConverter(locale));
             register(converterRegistry, new FloatConverter(locale));
             register(converterRegistry, new IntegerConverter(locale));
             register(converterRegistry, new LongConverter(locale));
+            register(converterRegistry, new ShortConverter(locale));
 
             for (SingleValueConverter converter : converters) {
                 registerConverter(converter);

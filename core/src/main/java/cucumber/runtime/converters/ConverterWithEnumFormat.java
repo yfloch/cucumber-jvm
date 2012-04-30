@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ConverterWithEnumFormat<T extends Enum> extends ConverterWithFormat<T> {
+public abstract class ConverterWithEnumFormat<T extends Enum> extends ConverterWithFormat<T> {
 
     private final List<Format> formats = new ArrayList<Format>();
     private Locale locale;

@@ -1,6 +1,6 @@
 package cucumber.runtime.java.picocontainer;
 
-import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
+import cucumber.runtime.xstream.converters.basic.AbstractSingleValueConverter;
 
 public class ThingConverter extends AbstractSingleValueConverter {
     @Override

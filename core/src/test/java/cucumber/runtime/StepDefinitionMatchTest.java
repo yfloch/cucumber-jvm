@@ -49,7 +49,9 @@ public class StepDefinitionMatchTest {
         when(stepWithoutDocStringOrTable.getDocString()).thenReturn(null);
         when(stepWithoutDocStringOrTable.getRows()).thenReturn(null);
 
-        StepDefinitionMatch stepDefinitionMatch = new StepDefinitionMatch(Arrays.asList(new Argument(0, "the thing")), stepDefinition, "some.feature", stepWithoutDocStringOrTable, new LocalizedXStreams(classLoader));
+        LocalizedXStreams localizedXStreams = new LocalizedXStreams(classLoader);
+        localizedXStreams.registerConverter(new ThingConverter());
+        StepDefinitionMatch stepDefinitionMatch = new StepDefinitionMatch(Arrays.asList(new Argument(0, "the thing")), stepDefinition, "some.feature", stepWithoutDocStringOrTable, localizedXStreams);
         stepDefinitionMatch.runStep(ENGLISH);
         verify(stepDefinition).execute(ENGLISH, new Object[]{new Thing("the thing")});
     }
@@ -113,7 +115,7 @@ public class StepDefinitionMatchTest {
                             "\n" +
                             "Alternatively, leave out the annotation and\n" +
                             "register it in your own implementation of\n" +
-                            "ObjectMapper.\n",
+                            "CucumberConfiguration.\n",
                     expected.getMessage()
             );
         }
