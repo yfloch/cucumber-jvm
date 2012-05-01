@@ -1,5 +1,7 @@
 package cucumber.io;
 
+import java.util.Iterator;
+
 public interface ResourceLoader {
-    Iterable<Resource> resources(String path, String suffix);
+    Iterator<Resource> resources(String path, String suffix);
 }

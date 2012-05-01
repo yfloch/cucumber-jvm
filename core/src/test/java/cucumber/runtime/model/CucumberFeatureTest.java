@@ -21,7 +21,7 @@ public class CucumberFeatureTest {
     public void fails_if_no_features_are_found() {
         try {
             ResourceLoader resourceLoader = mock(ResourceLoader.class);
-            when(resourceLoader.resources("does/not/exist", ".feature")).thenReturn(Collections.<Resource>emptyList());
+            when(resourceLoader.resources("does/not/exist", ".feature")).thenReturn(Collections.<Resource>emptyList().iterator());
             CucumberFeature.load(resourceLoader, asList("does/not/exist"), emptyList());
             fail("Should have failed");
         } catch (CucumberException e) {
@@ -38,7 +38,7 @@ public class CucumberFeatureTest {
             when(resource.getPath()).thenReturn("foo.feature");
             when(resource.getInputStream()).thenReturn(new ByteArrayInputStream("Feature: foo".getBytes("UTF-8")));
 
-            when(resourceLoader.resources("features", ".feature")).thenReturn(asList(resource));
+            when(resourceLoader.resources("features", ".feature")).thenReturn(asList(resource).iterator());
             CucumberFeature.load(resourceLoader, asList("features"), asList((Object) "@nowhere"));
             fail("Should have failed");
         } catch (CucumberException e) {

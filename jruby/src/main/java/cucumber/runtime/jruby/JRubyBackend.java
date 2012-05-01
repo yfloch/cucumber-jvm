@@ -18,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+import static cucumber.runtime.Utils.i;
 import static cucumber.runtime.Utils.packagePath;
 
 public class JRubyBackend implements Backend {
@@ -55,7 +56,7 @@ public class JRubyBackend implements Backend {
     public void loadGlue(Glue glue, List<String> gluePaths) {
         this.glue = glue;
         for (String gluePath : gluePaths) {
-            for (Resource resource : resourceLoader.resources(packagePath(gluePath), ".rb")) {
+            for (Resource resource : i(resourceLoader.resources(packagePath(gluePath), ".rb"))) {
                 runScriptlet(resource);
             }
         }

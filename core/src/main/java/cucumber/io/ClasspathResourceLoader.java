@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class ClasspathResourceLoader implements ResourceLoader {
     private final ClassLoader classLoader;
@@ -17,8 +18,8 @@ public class ClasspathResourceLoader implements ResourceLoader {
     }
 
     @Override
-    public Iterable<Resource> resources(String path, String suffix) {
-        return new ClasspathIterable(classLoader, path, suffix);
+    public Iterator<Resource> resources(String path, String suffix) {
+        return new ClasspathIterable(classLoader, path, suffix).iterator();
     }
 
     public Collection<Class<? extends Annotation>> getAnnotations(String packageName) {
@@ -28,7 +29,7 @@ public class ClasspathResourceLoader implements ResourceLoader {
     public <T> Collection<Class<? extends T>> getDescendants(Class<T> parentType, String packageName) {
         String packagePath = packageName.replace('.', '/').replace(File.separatorChar, '/');
         Collection<Class<? extends T>> result = new HashSet<Class<? extends T>>();
-        for (Resource classResource : resources(packagePath, ".class")) {
+        for (Resource classResource : Utils.i(resources(packagePath, ".class"))) {
             String className = classResource.getClassName();
             Class<?> clazz = loadClass(className, classLoader);
             if (clazz != null && !parentType.equals(clazz) && parentType.isAssignableFrom(clazz)) {

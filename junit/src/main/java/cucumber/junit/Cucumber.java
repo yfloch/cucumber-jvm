@@ -49,11 +49,12 @@ public class Cucumber extends ParentRunner<FeatureRunner> {
     public Cucumber(Class clazz) throws InitializationError, IOException {
         super(clazz);
         ClassLoader classLoader = clazz.getClassLoader();
-        ResourceLoader resourceLoader = new ClasspathResourceLoader(classLoader);
         assertNoCucumberAnnotatedMethods(clazz);
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
+
+        ResourceLoader resourceLoader = new ClasspathResourceLoader(classLoader);
         runtime = new Runtime(resourceLoader, classLoader, runtimeOptions);
 
         jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader), runtimeOptions.formatter(classLoader), runtimeOptions.strict);

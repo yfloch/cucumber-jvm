@@ -1,11 +1,12 @@
 package cucumber.io;
 
 import java.io.File;
+import java.util.Iterator;
 
 public class FileResourceLoader implements ResourceLoader {
     @Override
-    public Iterable<Resource> resources(String path, String suffix) {
+    public Iterator<Resource> resources(String path, String suffix) {
         File root = new File(path);
-        return new FileResourceIterable(root, root, suffix);
+        return new FileResourceIterator(root, root, suffix);
     }
 }

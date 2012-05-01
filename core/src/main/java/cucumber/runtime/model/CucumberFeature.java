@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static cucumber.runtime.Utils.i;
+
 public class CucumberFeature {
     private final String uri;
     private final Feature feature;
@@ -34,8 +36,7 @@ public class CucumberFeature {
         final FeatureBuilder builder = new FeatureBuilder(cucumberFeatures);
         boolean resourceFound = false;
         for (String featurePath : featurePaths) {
-            Iterable<Resource> resources = resourceLoader.resources(featurePath, ".feature");
-            for (Resource resource : resources) {
+            for (Resource resource : i(resourceLoader.resources(featurePath, ".feature"))) {
                 resourceFound = true;
                 builder.parse(resource, filters);
             }

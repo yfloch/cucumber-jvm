@@ -17,6 +17,7 @@ import org.python.util.PythonInterpreter;
 import java.io.IOException;
 import java.util.List;
 
+import static cucumber.runtime.Utils.i;
 import static cucumber.runtime.Utils.packagePath;
 
 public class JythonBackend implements Backend {
@@ -43,7 +44,7 @@ public class JythonBackend implements Backend {
         this.glue = glue;
 
         for (String gluePath : gluePaths) {
-            for (Resource resource : resourceLoader.resources(packagePath(gluePath), ".py")) {
+            for (Resource resource : i(resourceLoader.resources(packagePath(gluePath), ".py"))) {
                 execFile(resource);
             }
         }

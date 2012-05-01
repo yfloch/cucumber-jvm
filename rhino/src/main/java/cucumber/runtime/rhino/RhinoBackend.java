@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import static cucumber.runtime.Utils.i;
 import static cucumber.runtime.Utils.packagePath;
 import static cucumber.runtime.Utils.toPackage;
 
@@ -45,7 +46,7 @@ public class RhinoBackend implements Backend {
         this.glue = glue;
         this.gluePaths = gluePaths;
         for (String gluePath : gluePaths) {
-            for (Resource resource : resourceLoader.resources(packagePath(gluePath), ".js")) {
+            for (Resource resource : i(resourceLoader.resources(packagePath(gluePath), ".js"))) {
                 try {
                     cx.evaluateReader(scope, new InputStreamReader(resource.getInputStream(), "UTF-8"), resource.getPath(), 1, null);
                 } catch (IOException e) {

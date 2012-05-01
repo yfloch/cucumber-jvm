@@ -67,4 +67,13 @@ public class Utils {
             }
         };
     }
+
+    public static <T> Iterable<T> i(final Iterator<T> iterator) {
+        return new Iterable<T>() {
+            @Override
+            public Iterator<T> iterator() {
+                return iterator;
+            }
+        };
+    }
 }
