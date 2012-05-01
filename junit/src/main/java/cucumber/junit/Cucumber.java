@@ -1,6 +1,6 @@
 package cucumber.junit;
 
-import cucumber.io.ClasspathResourceLoader;
+import cucumber.io.MultiLoader;
 import cucumber.io.ResourceLoader;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Runtime;
@@ -54,7 +54,7 @@ public class Cucumber extends ParentRunner<FeatureRunner> {
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
-        ResourceLoader resourceLoader = new ClasspathResourceLoader(classLoader);
+        ResourceLoader resourceLoader = new MultiLoader(classLoader);
         runtime = new Runtime(resourceLoader, classLoader, runtimeOptions);
 
         jUnitReporter = new JUnitReporter(runtimeOptions.reporter(classLoader), runtimeOptions.formatter(classLoader), runtimeOptions.strict);
