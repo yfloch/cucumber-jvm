@@ -3,12 +3,12 @@ package cucumber.runtime.java;
 import cucumber.annotation.After;
 import cucumber.annotation.Before;
 import cucumber.annotation.Order;
-import cucumber.fallback.runtime.java.DefaultJavaObjectFactory;
 import cucumber.io.ClasspathResourceLoader;
 import cucumber.io.ResourceLoader;
 import cucumber.runtime.Backend;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Glue;
+import cucumber.runtime.ObjectFactory;
 import cucumber.runtime.UnreportedStepExecutor;
 import cucumber.runtime.Utils;
 import cucumber.runtime.snippets.SnippetGenerator;
@@ -29,27 +29,13 @@ public class JavaBackend implements Backend {
     public JavaBackend(ResourceLoader ignored) {
         classpathResourceLoader = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader());
         classpathMethodScanner = new ClasspathMethodScanner(classpathResourceLoader);
-        objectFactory = loadObjectFactory();
+        objectFactory = ObjectFactory.Factory.newInstance(classpathResourceLoader);
     }
 
     public JavaBackend(ObjectFactory objectFactory) {
         classpathResourceLoader = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader());
         classpathMethodScanner = new ClasspathMethodScanner(classpathResourceLoader);
         this.objectFactory = objectFactory;
-    }
-
-    private ObjectFactory loadObjectFactory() {
-        ObjectFactory foundOF;
-        if (ObjectFactoryHolder.getFactory() != null) {
-            foundOF = ObjectFactoryHolder.getFactory();
-        } else {
-            try {
-                foundOF = classpathResourceLoader.instantiateExactlyOneSubclass(ObjectFactory.class, "cucumber.runtime", new Class[0], new Object[0]);
-            } catch (CucumberException ce) {
-                foundOF = new DefaultJavaObjectFactory();
-            }
-        }
-        return foundOF;
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import cucumber.runtime.java.ObjectFactory;
+import cucumber.runtime.ObjectFactory;
 
 import java.io.IOException;
 import java.io.InputStream;

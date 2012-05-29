@@ -1,5 +1,7 @@
 package cucumber.runtime.java;
 
+import cucumber.runtime.ObjectFactory;
+
 public class SingletonFactory implements ObjectFactory {
     private final Object singleton;
 

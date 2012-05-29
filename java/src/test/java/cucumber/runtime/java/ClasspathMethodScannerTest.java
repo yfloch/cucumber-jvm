@@ -4,6 +4,7 @@ import cucumber.annotation.Before;
 import cucumber.io.ClasspathResourceLoader;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.Glue;
+import cucumber.runtime.ObjectFactory;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;

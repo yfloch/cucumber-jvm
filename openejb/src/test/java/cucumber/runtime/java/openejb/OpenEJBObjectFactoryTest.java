@@ -1,6 +1,6 @@
 package cucumber.runtime.java.openejb;
 
-import cucumber.runtime.java.ObjectFactory;
+import cucumber.runtime.ObjectFactory;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;

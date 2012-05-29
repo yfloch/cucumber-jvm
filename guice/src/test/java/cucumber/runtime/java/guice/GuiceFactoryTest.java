@@ -1,6 +1,6 @@
 package cucumber.runtime.java.guice;
 
-import cucumber.runtime.java.ObjectFactory;
+import cucumber.runtime.ObjectFactory;
 import org.junit.Test;
 
 import java.io.IOException;

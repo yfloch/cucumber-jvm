@@ -1,6 +1,7 @@
 package cucumber.runtime.java;
 
 import cucumber.runtime.HookDefinition;
+import cucumber.runtime.ObjectFactory;
 import cucumber.runtime.ScenarioResult;
 import cucumber.runtime.Utils;
 import gherkin.TagExpression;

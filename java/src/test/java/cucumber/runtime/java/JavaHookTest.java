@@ -5,6 +5,7 @@ import cucumber.annotation.Before;
 import cucumber.annotation.Order;
 import cucumber.runtime.Glue;
 import cucumber.runtime.HookDefinition;
+import cucumber.runtime.ObjectFactory;
 import cucumber.runtime.RuntimeGlue;
 import cucumber.runtime.UndefinedStepsTracker;
 import cucumber.runtime.converters.LocalizedXStreams;

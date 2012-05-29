@@ -1,6 +1,6 @@
 package cucumber.runtime.java.picocontainer;
 
-import cucumber.runtime.java.ObjectFactory;
+import cucumber.runtime.ObjectFactory;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 
