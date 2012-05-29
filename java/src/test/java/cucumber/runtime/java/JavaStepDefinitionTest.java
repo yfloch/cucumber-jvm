@@ -20,10 +20,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -50,7 +47,7 @@ public class JavaStepDefinitionTest {
     private final Defs defs = new Defs();
     private final JavaBackend backend = new JavaBackend(new SingletonFactory(defs));
     private final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    private final RuntimeOptions runtimeOptions = new RuntimeOptions();
+    private final RuntimeOptions runtimeOptions = new RuntimeOptions(new Properties());
     private final Runtime runtime = new Runtime(new ClasspathResourceLoader(classLoader), classLoader, asList(backend), runtimeOptions);
     private final Glue glue = runtime.getGlue();
 

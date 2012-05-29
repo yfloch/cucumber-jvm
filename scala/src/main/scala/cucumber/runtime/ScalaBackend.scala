@@ -34,7 +34,8 @@ class ScalaBackend(ignore:ResourceLoader) extends Backend {
 
   def loadGlue(glue: Glue, gluePaths: JList[String], localizedXStreams: LocalizedXStreams) {
     val cl = new ClasspathResourceLoader(Thread.currentThread().getContextClassLoader)
-    val dslClasses =  gluePaths flatMap {cl.getDescendants(classOf[ScalaDsl], _) } filter { cls =>
+    val packages = gluePaths map { cucumber.io.MultiLoader.packageName(_) }
+    val dslClasses = packages flatMap { cl.getDescendants(classOf[ScalaDsl], _) } filter { cls =>
       try {
         cls.getDeclaredConstructor()
         true

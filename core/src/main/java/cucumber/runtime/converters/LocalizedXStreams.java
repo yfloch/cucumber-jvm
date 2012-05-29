@@ -5,7 +5,6 @@ import com.thoughtworks.xstream.converters.ConverterLookup;
 import com.thoughtworks.xstream.converters.ConverterRegistry;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.core.DefaultConverterLookup;
-import gherkin.I18n;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class LocalizedXStreams {
-    private final Map<I18n, LocalizedXStream> xStreams = new HashMap<I18n, LocalizedXStream>();
+    private final Map<Locale, LocalizedXStream> xStreamsByLocale = new HashMap<Locale, LocalizedXStream>();
     private final ClassLoader classLoader;
     private final List<SingleValueConverter> converters = new ArrayList<SingleValueConverter>();
 
@@ -22,11 +21,11 @@ public class LocalizedXStreams {
         this.classLoader = classLoader;
     }
 
-    public LocalizedXStream get(I18n i18n) {
-        LocalizedXStream xStream = xStreams.get(i18n);
+    public LocalizedXStream get(Locale locale) {
+        LocalizedXStream xStream = xStreamsByLocale.get(locale);
         if (xStream == null) {
-            xStream = newXStream(i18n.getLocale());
-            xStreams.put(i18n, xStream);
+            xStream = newXStream(locale);
+            xStreamsByLocale.put(locale, xStream);
         }
         return xStream;
     }

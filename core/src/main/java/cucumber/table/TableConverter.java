@@ -1,12 +1,12 @@
 package cucumber.table;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import cucumber.runtime.CucumberException;
+import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.table.xstream.DataTableWriter;
 import cucumber.table.xstream.ListOfListOfSingleValueReader;
 import cucumber.table.xstream.ListOfListOfSingleValueWriter;
@@ -15,6 +15,7 @@ import cucumber.table.xstream.ListOfObjectReader;
 import cucumber.table.xstream.ListOfObjectWriter;
 import gherkin.util.Mapper;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -24,10 +25,12 @@ import java.util.Map;
 import static gherkin.util.FixJava.map;
 
 public class TableConverter {
-    private final XStream xStream;
+    private final LocalizedXStreams.LocalizedXStream xStream;
+    private final String dateFormat;
 
-    public TableConverter(XStream xStream) {
+    public TableConverter(LocalizedXStreams.LocalizedXStream xStream, String dateFormat) {
         this.xStream = xStream;
+        this.dateFormat = dateFormat;
     }
 
     /**
@@ -46,11 +49,14 @@ public class TableConverter {
             reader = new ListOfObjectReader(itemType, convertedAttributeNames(dataTable), dataTable.cells(1));
         }
         try {
+            xStream.setDateFormat(dateFormat);
             return (List) xStream.unmarshal(reader);
         } catch (AbstractReflectionConverter.UnknownFieldException e) {
             throw new CucumberException(e.getShortMessage());
-        } catch (ConversionException e){
+        } catch (ConversionException e) {
             throw new CucumberException(String.format("Can't assign null value to one of the primitive fields in %s. Please use boxed types.", e.get("class")));
+        } finally {
+            xStream.unsetDateFormat();
         }
     }
 
@@ -67,10 +73,29 @@ public class TableConverter {
             objects = wrapLists((List<List<?>>) objects);
             writer = new ListOfListOfSingleValueWriter(this);
         } else {
-            writer = new ListOfObjectWriter(this);
+            if (columnNames.length == 0) {
+                // Figure out column names by looking at class
+                columnNames = fieldNames(objects.get(0).getClass());
+            }
+            writer = new ListOfObjectWriter(this, columnNames);
         }
-        xStream.marshal(objects, writer);
-        return writer.getDataTable();
+        try {
+            xStream.setDateFormat(dateFormat);
+            xStream.marshal(objects, writer);
+            return writer.getDataTable();
+        } finally {
+            xStream.unsetDateFormat();
+        }
+    }
+
+    private String[] fieldNames(Class clazz) {
+        Field[] fields = clazz.getFields();
+        String[] fieldNames = new String[fields.length];
+        int i = 0;
+        for (Field field : fields) {
+            fieldNames[i++] = field.getName();
+        }
+        return fieldNames;
     }
 
     // This is a hack to prevent XStream from outputting weird-looking "XML" for Arrays.asList() - created lists.
@@ -95,10 +120,12 @@ public class TableConverter {
     }
 
     private boolean isListOfListOfSingleValue(List<?> objects) {
-        if (objects.size() > 0 && objects.get(0) instanceof List) {
-            List firstList = (List) objects.get(0);
-            if (firstList.size() > 0 && isSingleValue(firstList.get(0).getClass())) {
-                return true;
+        for (Object object : objects) {
+            if (object instanceof List) {
+                List list = (List) object;
+                if (list.size() > 0 && isSingleValue(list.get(0).getClass())) {
+                    return true;
+                }
             }
         }
         return false;

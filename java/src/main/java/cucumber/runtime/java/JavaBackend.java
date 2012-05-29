@@ -80,12 +80,12 @@ public class JavaBackend implements Backend {
 
     @Override
     public void buildWorld() {
-        objectFactory.createInstances();
+        objectFactory.start();
     }
 
     @Override
     public void disposeWorld() {
-        objectFactory.disposeInstances();
+        objectFactory.stop();
     }
 
     @Override

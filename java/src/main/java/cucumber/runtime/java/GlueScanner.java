@@ -13,8 +13,9 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 
-class GlueScanner {
+import static cucumber.io.MultiLoader.packageName;
 
+class GlueScanner {
     private final ClasspathResourceLoader classpathResourceLoader;
     private final Collection<Class<? extends Annotation>> cucumberAnnotationClasses;
 
@@ -31,11 +32,7 @@ class GlueScanner {
      */
     public void scan(JavaBackend javaBackend, List<String> gluePaths) {
         for (String gluePath : gluePaths) {
-            if (gluePath.contains("/") || gluePath.contains("\\")) {
-                throw new CucumberException("Java glue must be a Java package name - not a path: " + gluePath);
-            }
-            // We can be fairly confident that gluePath is a package name at this point
-            for (Class<?> glueCodeClass : classpathResourceLoader.getDescendants(Object.class, gluePath)) {
+            for (Class<?> glueCodeClass : classpathResourceLoader.getDescendants(Object.class, packageName(gluePath))) {
                 while (glueCodeClass != null && glueCodeClass != Object.class && !Utils.isInstantiable(glueCodeClass)) {
                     // those can't be instantiated without container class present.
                     glueCodeClass = glueCodeClass.getSuperclass();
@@ -49,17 +46,16 @@ class GlueScanner {
         }
     }
 
+    // TODO: Move this method to core somewhere.
     public void configureXStream(LocalizedXStreams localizedXStreams, List<String> gluePaths) {
         for (String gluePath : gluePaths) {
-            if (gluePath.contains("/") || gluePath.contains("\\")) {
-                throw new CucumberException("Java glue must be a Java package name - not a path: " + gluePath);
-            }
-            // We can be fairly confident that gluePath is a package name at this point
             for (CucumberConfig cucumberConfig : classpathResourceLoader.instantiateSubclasses(CucumberConfig.class, gluePath, new Class[0], new Object[0])) {
                 try {
                     cucumberConfig.configure(localizedXStreams);
-                } catch (Exception e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (CucumberException e) {
+                    throw e;
+                } catch (Throwable e) {
+                    throw new CucumberException(e);
                 }
             }
         }

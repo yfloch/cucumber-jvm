@@ -5,6 +5,11 @@ import cucumber.runtime.converters.LocalizedXStreams;
 import cucumber.runtime.java.CucumberConfig;
 
 public class MyCucumberConfig implements CucumberConfig {
+
+    public MyCucumberConfig() {
+        System.out.println("**** CUSTOM CUCUMBER CONFIGURATION ****");
+    }
+
     @Override
     public void configure(LocalizedXStreams localizedXStreams) throws Exception {
         localizedXStreams.registerConverter(new ThingConverter());
