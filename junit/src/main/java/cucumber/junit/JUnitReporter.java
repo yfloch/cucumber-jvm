@@ -53,11 +53,15 @@ class JUnitReporter implements Reporter, Formatter {
         } else {
             executionUnitNotifier.fireTestFinished();
         }
+        executionUnitNotifier = null;
     }
 
     public void match(Match match) {
-        Description description = executionUnitRunner.describeChild(steps.remove(0));
-        stepNotifier = new EachTestNotifier(runNotifier, description);
+        if(executionUnitRunner != null) {
+            // It's null when a scenario outline step is "matched"
+            Description description = executionUnitRunner.describeChild(steps.remove(0));
+            stepNotifier = new EachTestNotifier(runNotifier, description);
+        }
         reporter.match(match);
     }
 
@@ -72,29 +76,32 @@ class JUnitReporter implements Reporter, Formatter {
     }
 
     public void result(Result result) {
-        Throwable error = result.getError();
-        if (Result.SKIPPED == result) {
-            stepNotifier.fireTestIgnored();
-        } else if (isPendingOrUndefined(result)) {
-            addFailureOrIgnoreStep(result);
-        } else {
-            if (stepNotifier != null) {
-                //Should only fireTestStarted if not ignored
-                stepNotifier.fireTestStarted();
-                if (error != null) {
-                    stepNotifier.addFailure(error);
+        if(stepNotifier != null) {
+            // It's null if this is the "result" of a scenario outline step
+            Throwable error = result.getError();
+            if (Result.SKIPPED == result) {
+                stepNotifier.fireTestIgnored();
+            } else if (isPendingOrUndefined(result)) {
+                addFailureOrIgnoreStep(result);
+            } else {
+                if (stepNotifier != null) {
+                    //Should only fireTestStarted if not ignored
+                    stepNotifier.fireTestStarted();
+                    if (error != null) {
+                        stepNotifier.addFailure(error);
+                    }
+                    stepNotifier.fireTestFinished();
                 }
-                stepNotifier.fireTestFinished();
+                if (error != null) {
+                    executionUnitNotifier.addFailure(error);
+                }
             }
-            if (error != null) {
-                executionUnitNotifier.addFailure(error);
+            if (steps.isEmpty()) {
+                // We have run all of our steps. Set the stepNotifier to null so that
+                // if an error occurs in an After block, it's reported against the scenario
+                // instead (via executionUnitNotifier).
+                stepNotifier = null;
             }
-        }
-        if (steps.isEmpty()) {
-            // We have run all of our steps. Set the stepNotifier to null so that
-            // if an error occurs in an After block, it's reported against the scenario
-            // instead (via executionUnitNotifier).
-            stepNotifier = null;
         }
         reporter.result(result);
     }

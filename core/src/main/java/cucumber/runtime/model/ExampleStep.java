@@ -10,7 +10,7 @@ import java.util.Set;
 
 class ExampleStep extends Step {
     // TODO: Use this to colour columns in associated Example row with our associated status.
-    private final Set<Integer> matchedColumns;
+    private final transient Set<Integer> matchedColumns;
 
     public ExampleStep(List<Comment> comments, String keyword, String name, int line, List<DataTableRow> rows, DocString docString, Set<Integer> matchedColumns) {
         super(comments, keyword, name, line, rows, docString);

@@ -7,6 +7,8 @@ import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.DocString;
 import gherkin.formatter.model.Examples;
 import gherkin.formatter.model.ExamplesTableRow;
+import gherkin.formatter.model.Match;
+import gherkin.formatter.model.Result;
 import gherkin.formatter.model.Row;
 import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.ScenarioOutline;
@@ -38,12 +40,21 @@ public class CucumberScenarioOutline extends CucumberTagStatement {
     @Override
     public void run(Formatter formatter, Reporter reporter, Runtime runtime) {
         format(formatter);
+        reportOutlineSteps(formatter, reporter);
         for (CucumberExamples cucumberExamples : cucumberExamplesList) {
             cucumberExamples.format(formatter);
             List<CucumberScenario> exampleScenarios = cucumberExamples.createExampleScenarios();
             for (CucumberScenario exampleScenario : exampleScenarios) {
                 exampleScenario.run(formatter, reporter, runtime);
             }
+        }
+    }
+
+    private void reportOutlineSteps(Formatter formatter, Reporter reporter) {
+        for (Step step : getSteps()) {
+//            formatter.step(step);
+            reporter.match(Match.UNDEFINED);
+            reporter.result(Result.SKIPPED);
         }
     }
 

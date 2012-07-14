@@ -18,11 +18,11 @@ import static cucumber.junit.DescriptionFactory.createDescription;
  * Runs a scenario, or a "synthetic" scenario derived from an Examples row.
  */
 class ExecutionUnitRunner extends ParentRunner<Step> {
+    private final Map<Step, Description> stepDescriptions = new HashMap<Step, Description>();
     private final Runtime runtime;
     private final CucumberScenario cucumberScenario;
     private final JUnitReporter jUnitReporter;
     private Description description;
-    private final Map<Step, Description> stepDescriptions = new HashMap<Step, Description>();
 
     public ExecutionUnitRunner(Runtime runtime, CucumberScenario cucumberScenario, JUnitReporter jUnitReporter) throws InitializationError {
         super(ExecutionUnitRunner.class);

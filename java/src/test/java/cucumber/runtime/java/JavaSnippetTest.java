@@ -19,6 +19,17 @@ public class JavaSnippetTest {
     private static final List<Comment> NO_COMMENTS = Collections.emptyList();
 
     @Test
+    public void escapesDollars() {
+        String expected = "" +
+                "@Given(\"^I have (\\\\d+) cukes in my \\\"([^\\\"]*)\\\" belly$\")\n" +
+                "public void I_have_cukes_in_my_belly(int arg1, String arg2) throws Throwable {\n" +
+                "    // Express the Regexp above with the code you wish you had\n" +
+                "    throw new PendingException();\n" +
+                "}\n";
+        assertEquals(expected, snippetFor("I have $2 in my account"));
+    }
+
+    @Test
     public void generatesPlainSnippet() {
         String expected = "" +
                 "@Given(\"^I have (\\\\d+) cukes in my \\\"([^\\\"]*)\\\" belly$\")\n" +
