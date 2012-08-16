@@ -48,19 +48,24 @@ public class RuntimeTest {
                 "    \"line\": 1,\n" +
                 "    \"elements\": [\n" +
                 "      {\n" +
+                "        \"hooks\": [\n" +
+                "          {\n" +
+                "            \"result\": {\n" +
+                "              \"status\": \"undefined\"\n" +
+                "            },\n" +
+                "            \"match\": {},\n" +
+                "            \"type\": \"background\"\n" +
+                "          }\n" +
+                "        ],\n" +
                 "        \"description\": \"\",\n" +
                 "        \"name\": \"background name\",\n" +
                 "        \"keyword\": \"Background\",\n" +
                 "        \"line\": 2,\n" +
                 "        \"steps\": [\n" +
                 "          {\n" +
-                "            \"result\": {\n" +
-                "              \"status\": \"undefined\"\n" +
-                "            },\n" +
                 "            \"name\": \"b\",\n" +
                 "            \"keyword\": \"Given \",\n" +
-                "            \"line\": 3,\n" +
-                "            \"match\": {}\n" +
+                "            \"line\": 3\n" +
                 "          }\n" +
                 "        ],\n" +
                 "        \"type\": \"background\"\n" +

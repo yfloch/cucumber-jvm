@@ -17,12 +17,12 @@
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-deps</artifactId>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-junit</artifactId>

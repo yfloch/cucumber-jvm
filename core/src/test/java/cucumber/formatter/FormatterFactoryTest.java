@@ -19,7 +19,7 @@ public class FormatterFactoryTest {
     @Test
     public void instantiates_junit_formatter_with_file_arg() {
         Formatter formatter = fc.create("junit:some_file.xml");
-        assertEquals(JUnitFormatter.class, formatter.getClass());
+        assertEquals(JUnitReportFormatter.class, formatter.getClass());
     }
 
     @Test

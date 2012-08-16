@@ -23,7 +23,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
@@ -32,14 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class JUnitFormatter implements Formatter, Reporter {
+public class JUnitReportFormatter implements Formatter, Reporter {
     private final File out;
     private final Document doc;
     private final Element rootElement;
 
     private TestCase testCase;
 
-    public JUnitFormatter(File out) {
+    public JUnitReportFormatter(File out) {
         this.out = out;
         try {
             doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -103,20 +102,10 @@ public class JUnitFormatter implements Formatter, Reporter {
     }
 
     @Override
-    public void before(Match match, Result result) {
-        handleHook(match, result);
-    }
-
-    @Override
-    public void after(Match match, Result result) {
-        handleHook(match, result);
-    }
-
-    private void handleHook(Match match, Result result) {
+    public void hook(String type, Match match, Result result) {
         if (result.getStatus().equals(Result.FAILED)) {
             testCase.results.add(result);
         }
-
     }
 
     private void increaseAttributeValue(Element element, String attribute) {
@@ -141,7 +130,7 @@ public class JUnitFormatter implements Formatter, Reporter {
     }
 
     @Override
-    public void embedding(String mimeType, InputStream data) {
+    public void embedding(String mimeType, byte[] data) {
     }
 
     @Override

@@ -99,6 +99,7 @@
          (hook-fun))
        (matches [hd tags]
          (.eval te tags))
+       (getLocation [hd detail] (str "fixme:999"))
        (getOrder [hd] 0)))))
 
 (defmethod add-hook-definition :after [_ tag-expression hook-fun]

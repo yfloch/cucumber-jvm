@@ -1,6 +1,16 @@
 [
   {
-    "steps": [],
+    "steps": [
+      {
+        "name": "I add them",
+        "args": [
+          {
+            "offset": 6,
+            "val": "them"
+          }
+        ]
+      }
+    ],
     "source": "^I add (.*)",
     "flags": ""
   },

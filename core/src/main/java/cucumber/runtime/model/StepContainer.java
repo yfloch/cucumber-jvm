@@ -27,7 +27,7 @@ public class StepContainer {
         steps.add(step);
     }
 
-    void format(Formatter formatter) {
+    public void format(Formatter formatter) {
         statement.replay(formatter);
         for (Step step : getSteps()) {
             formatter.step(step);

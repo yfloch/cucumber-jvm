@@ -16,6 +16,7 @@ public class StepDefs {
 
     @Before
     public void before() {
+        System.out.println("Before Hook");
     }
 
     @Before("@gh210")

@@ -31,7 +31,7 @@ public class FormatterFactory {
 
     private static final Map<String, Class<? extends Formatter>> FORMATTER_CLASSES = new HashMap<String, Class<? extends Formatter>>() {{
         put("null", NullFormatter.class);
-        put("junit", JUnitFormatter.class);
+        put("junit", JUnitReportFormatter.class);
         put("html", HTMLFormatter.class);
         put("pretty", CucumberPrettyFormatter.class);
         put("progress", ProgressFormatter.class);

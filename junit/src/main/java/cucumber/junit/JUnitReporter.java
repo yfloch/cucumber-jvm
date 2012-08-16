@@ -14,7 +14,6 @@ import org.junit.internal.runners.model.EachTestNotifier;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +54,7 @@ class JUnitReporter implements Reporter, Formatter {
         }
     }
 
+    @Override
     public void match(Match match) {
         Description description = executionUnitRunner.describeChild(steps.remove(0));
         stepNotifier = new EachTestNotifier(runNotifier, description);
@@ -62,7 +62,7 @@ class JUnitReporter implements Reporter, Formatter {
     }
 
     @Override
-    public void embedding(String mimeType, InputStream data) {
+    public void embedding(String mimeType, byte[] data) {
         reporter.embedding(mimeType, data);
     }
 
@@ -71,6 +71,7 @@ class JUnitReporter implements Reporter, Formatter {
         reporter.write(text);
     }
 
+    @Override
     public void result(Result result) {
         Throwable error = result.getError();
         if (Result.SKIPPED == result) {
@@ -124,17 +125,9 @@ class JUnitReporter implements Reporter, Formatter {
     }
 
     @Override
-    public void before(Match match, Result result) {
-        handleHook(match, result);
-    }
-
-    @Override
-    public void after(Match match, Result result) {
-        handleHook(match, result);
-    }
-
-    private void handleHook(Match match, Result result) {
-        if(result.getStatus().equals(Result.FAILED)) {
+    public void hook(String type, Match match, Result result) {
+        reporter.hook(type, match, result);
+        if (result.getStatus().equals(Result.FAILED)) {
             executionUnitNotifier.addFailure(result.getError());
         }
     }

@@ -162,39 +162,41 @@ public class Runtime implements UnreportedStepExecutor {
     }
 
     public void runBeforeHooks(Reporter reporter, Set<Tag> tags) {
-        runHooks(glue.getBeforeHooks(), reporter, tags, true);
+        runHooks(glue.getBeforeHooks(), reporter, tags, "before");
     }
 
     public void runAfterHooks(Reporter reporter, Set<Tag> tags) {
-        runHooks(glue.getAfterHooks(), reporter, tags, false);
+        runHooks(glue.getAfterHooks(), reporter, tags, "after");
     }
 
-    private void runHooks(List<HookDefinition> hooks, Reporter reporter, Set<Tag> tags, boolean isBefore) {
+    private void runHooks(List<HookDefinition> hooks, Reporter reporter, Set<Tag> tags, String type) {
         for (HookDefinition hook : hooks) {
-            runHookIfTagsMatch(hook, reporter, tags, isBefore);
+            runHookIfTagsMatch(hook, reporter, tags, type);
         }
     }
 
-    private void runHookIfTagsMatch(HookDefinition hook, Reporter reporter, Set<Tag> tags, boolean isBefore) {
+    private void runHookIfTagsMatch(HookDefinition hook, Reporter reporter, Set<Tag> tags, String type) {
         if (hook.matches(tags)) {
+            Match match = new Match(Collections.<Argument>emptyList(), hook.getLocation(false));
+            Throwable error;
+            String status;
+
             long start = System.nanoTime();
             try {
                 hook.execute(scenarioResult);
+                error = null;
+                status = Result.PASSED;
             } catch (Throwable t) {
+                error = t;
+                status = Result.FAILED;
                 skipNextStep = true;
-                long duration = System.nanoTime() - start;
-
-                Result result = new Result(Result.FAILED, duration, t, DUMMY_ARG);
-                scenarioResult.add(result);
                 addError(t);
-
-                Match match = new Match(Collections.<Argument>emptyList(), hook.getLocation(false));
-                if (isBefore) {
-                    reporter.before(match, result);
-                } else {
-                    reporter.after(match, result);
-                }
             }
+            long duration = System.nanoTime() - start;
+
+            Result result = new Result(status, duration, error, DUMMY_ARG);
+            scenarioResult.add(result);
+            reporter.hook(type, match, result);
         }
     }
 

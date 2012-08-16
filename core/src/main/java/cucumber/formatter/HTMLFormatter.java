@@ -128,13 +128,8 @@ public class HTMLFormatter implements Formatter, Reporter {
     }
 
     @Override
-    public void before(Match match, Result result) {
-        writeToJsReport("before", result);
-    }
-
-    @Override
-    public void after(Match match, Result result) {
-        writeToJsReport("after", result);
+    public void hook(String type, Match match, Result result) {
+        writeToJsReport(type, result);
     }
 
     @Override
@@ -143,7 +138,7 @@ public class HTMLFormatter implements Formatter, Reporter {
     }
 
     @Override
-    public void embedding(String mimeType, InputStream data) {
+    public void embedding(String mimeType, byte[] data) {
         // Creating a file instead of using data urls to not clutter the js file
         String extension = MIME_TYPES_EXTENSIONS.get(mimeType);
         if (extension != null) {
@@ -173,6 +168,15 @@ public class HTMLFormatter implements Formatter, Reporter {
                 out.write(buffer, 0, len);
                 len = in.read(buffer);
             }
+            out.close();
+        } catch (IOException e) {
+            throw new CucumberException("Unable to write to report file item: ", e);
+        }
+    }
+
+    private void writeBytes(byte[] data, OutputStream out) {
+        try {
+            out.write(data);
             out.close();
         } catch (IOException e) {
             throw new CucumberException("Unable to write to report file item: ", e);

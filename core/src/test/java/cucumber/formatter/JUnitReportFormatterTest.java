@@ -22,7 +22,7 @@ import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class JUnitFormatterTest {
+public class JUnitReportFormatterTest {
 
     @Test
     public void featureSimpleTest() throws Exception {

@@ -13,7 +13,6 @@ import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.ScenarioOutline;
 import gherkin.formatter.model.Step;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,25 +98,8 @@ public class ProgressFormatter implements Formatter, Reporter, ColorAware {
     }
 
     @Override
-    public void before(Match match, Result result) {
-        handleHook(match, result, "B");
-    }
-
-    @Override
-    public void after(Match match, Result result) {
-        handleHook(match, result, "A");
-    }
-
-    private void handleHook(Match match, Result result, String character) {
-        if (result.getStatus().equals(Result.FAILED)) {
-            if (!monochrome) {
-                ANSI_ESCAPES.get(result.getStatus()).appendTo(out);
-            }
-            out.append(character);
-            if (!monochrome) {
-                AnsiEscapes.RESET.appendTo(out);
-            }
-        }
+    public void hook(String type, Match match, Result result) {
+        result(result);
     }
 
     @Override
@@ -125,7 +107,7 @@ public class ProgressFormatter implements Formatter, Reporter, ColorAware {
     }
 
     @Override
-    public void embedding(String mimeType, InputStream data) {
+    public void embedding(String mimeType, byte[] data) {
     }
 
     @Override

@@ -5,5 +5,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 //@Cucumber.Options(features = "classpath:cucumber/runtime/java/picocontainer/dates.feature:3:11")
+@Cucumber.Options(tags = "@gherkin-issue-165", format = "json-pretty")
 public class RunCukesTest {
 }

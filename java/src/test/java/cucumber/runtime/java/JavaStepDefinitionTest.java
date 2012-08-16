@@ -17,7 +17,6 @@ import gherkin.formatter.model.Tag;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,20 +86,15 @@ public class JavaStepDefinitionTest {
 
         Reporter reporter = new Reporter() {
             @Override
-            public void before(Match match, Result result) {
+            public void hook(String type, Match match, Result result) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
             public void result(Result result) {
-                if(result.getError() != null) {
+                if (result.getError() != null) {
                     throw new RuntimeException(result.getError());
                 }
-            }
-
-            @Override
-            public void after(Match match, Result result) {
-                throw new UnsupportedOperationException();
             }
 
             @Override
@@ -108,7 +102,7 @@ public class JavaStepDefinitionTest {
             }
 
             @Override
-            public void embedding(String mimeType, InputStream data) {
+            public void embedding(String mimeType, byte[] data) {
             }
 
             @Override
