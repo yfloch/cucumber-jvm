@@ -1,4 +1,4 @@
-package cucumber.examples.spring.txn;
+package cucumber.examples.squeaker.models;
 
 import java.util.List;
 

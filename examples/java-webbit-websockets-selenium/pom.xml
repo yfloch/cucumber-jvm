@@ -39,13 +39,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-chrome-driver</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-server</artifactId>
+            <groupId>info.cukes</groupId>
+            <artifactId>cucumber-selenium</artifactId>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

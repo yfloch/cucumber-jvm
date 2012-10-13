@@ -1,4 +1,4 @@
-package cucumber.examples.java.websockets;
+package cucumber.api.selenium;
 
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -17,19 +17,19 @@ import org.openqa.selenium.support.events.EventFiringWebDriver;
  * To prevent browser state from leaking between scenarios, cookies are automatically deleted before every scenario.
  * </p>
  * <p>
- * A new instance of SharedDriver is created for each Scenario and passed to yor Stepdef classes via Dependency Injection
+ * A new instance of CucumberDriver is created for each Scenario and passed to yor Stepdef classes via Dependency Injection
  * </p>
  * <p>
  * As a bonus, screenshots are embedded into the report for each scenario. (This only works
  * if you're also using the HTML formatter).
  * </p>
  * <p>
- * A new instance of the SharedDriver is created for each Scenario and then passed to the Step Definition classes'
+ * A new instance of the CucumberDriver is created for each Scenario and then passed to the Step Definition classes'
  * constructor. They all receive a reference to the same instance. However, the REAL_DRIVER is the same instance throughout
  * the life of the JVM.
  * </p>
  */
-public class SharedDriver extends EventFiringWebDriver {
+public class CucumberDriver extends EventFiringWebDriver {
     private static final WebDriver REAL_DRIVER = new ChromeDriver();
     private static final Thread CLOSE_THREAD = new Thread() {
         @Override
@@ -42,7 +42,7 @@ public class SharedDriver extends EventFiringWebDriver {
         Runtime.getRuntime().addShutdownHook(CLOSE_THREAD);
     }
 
-    public SharedDriver() {
+    public CucumberDriver() {
         super(REAL_DRIVER);
     }
 

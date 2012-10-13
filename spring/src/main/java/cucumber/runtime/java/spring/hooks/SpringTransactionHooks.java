@@ -6,6 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -53,7 +54,9 @@ public class SpringTransactionHooks implements BeanFactoryAware {
 
     @Before({"@txn"})
     public void startTransaction() {
-        txStatus = obtainPlatformTransactionManager().getTransaction(new DefaultTransactionDefinition());
+        DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
+        transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_READ_UNCOMMITTED);
+        txStatus = obtainPlatformTransactionManager().getTransaction(transactionDefinition);
     }
 
     @After({"@txn"})

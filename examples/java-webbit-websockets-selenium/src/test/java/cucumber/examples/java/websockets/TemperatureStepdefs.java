@@ -2,6 +2,7 @@ package cucumber.examples.java.websockets;
 
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cucumber.api.selenium.CucumberDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -10,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class TemperatureStepdefs {
     private final WebDriver webDriver;
 
-    public TemperatureStepdefs(SharedDriver webDriver) {
+    public TemperatureStepdefs(CucumberDriver webDriver) {
         this.webDriver = webDriver;
     }
 

@@ -13,19 +13,17 @@
 
     <context:property-placeholder location="classpath:jdbc.properties"/>
 
-    <bean id="dataSource"
-          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${database.driver}"/>
         <property name="url" value="${database.url}"/>
         <property name="username" value="${database.user}"/>
         <property name="password" value="${database.password}"/>
     </bean>
 
-    <bean id="entityManagerFactory"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 
         <!-- THIS IS WHERE THE MODELS ARE -->
-        <property name="packagesToScan" value="cucumber.examples.spring.txn"/>
+        <property name="packagesToScan" value="cucumber.examples.squeaker.models"/>
 
         <property name="dataSource" ref="dataSource"/>
         <property name="jpaVendorAdapter">
@@ -37,6 +35,7 @@
         </property>
     </bean>
 
+    <!-- scope="singleton" to avoid deadlock? -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>

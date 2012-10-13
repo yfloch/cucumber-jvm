@@ -1,12 +1,13 @@
 package cucumber.examples.java.websockets;
 
 import cucumber.api.java.en.Given;
+import cucumber.api.selenium.CucumberDriver;
 import org.openqa.selenium.WebDriver;
 
 public class NavigationStepdefs {
     private final WebDriver webDriver;
 
-    public NavigationStepdefs(SharedDriver webDriver) {
+    public NavigationStepdefs(CucumberDriver webDriver) {
         this.webDriver = webDriver;
     }
 

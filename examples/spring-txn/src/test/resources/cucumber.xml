@@ -7,6 +7,8 @@
     <context:component-scan base-package="cucumber.examples.spring.txn"/>
     <context:annotation-config/>
 
-    <import resource="classpath*:/applicationContext.xml"/>
+    <import resource="classpath:application-context.xml"/>
+    <import resource="classpath:selenium-context.xml"/>
+    <import resource="classpath:jetty-context.xml"/>
 
 </beans>

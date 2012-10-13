@@ -244,6 +244,7 @@
         <module>junit</module>
         <module>jruby</module>
         <module>jython</module>
+        <module>selenium</module>
         <module>spring</module>
         <module>guice</module>
         <module>weld</module>

@@ -1,4 +1,4 @@
-package cucumber.examples.spring.txn;
+package cucumber.examples.squeaker.models;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Squeaker</title>
+</head>
+<body>
+
+
+
+<form id="search" method="get" action="/search">
+    <fieldset>
+        <input type="text" id="query" name="query" autocomplete="off" />
+        <input type="submit" value="Search" />
+    </fieldset>
+
+    <ol class="results">
+        <#list messages as message>
+            <li>${message.content}</li>
+        </#list>
+    </ol>
+</form>
+
+
+
+
+</body>
+</html>
