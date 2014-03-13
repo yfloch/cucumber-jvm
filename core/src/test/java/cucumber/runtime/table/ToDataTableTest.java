@@ -31,7 +31,7 @@ public class ToDataTableTest {
 
     @Test
     public void converts_list_of_beans_to_table() {
-        List<UserPojo> users = tc.toList(UserPojo.class, personTable());
+        List<UserPojo> users = tc.toList(personTable(), UserPojo.class);
         DataTable table = tc.toTable(users);
         assertEquals("" +
                 "      | credits | name        | birthDate  |\n" +
@@ -42,7 +42,7 @@ public class ToDataTableTest {
 
     @Test
     public void converts_list_of_beans_with_null_to_table() {
-        List<UserPojo> users = tc.toList(UserPojo.class, personTableWithNull());
+        List<UserPojo> users = tc.toList(personTableWithNull(), UserPojo.class);
         DataTable table = tc.toTable(users, "name", "birthDate", "credits");
         assertEquals("" +
                 "      | name        | birthDate  | credits |\n" +
@@ -54,12 +54,12 @@ public class ToDataTableTest {
     @Test
     public void gives_a_nice_error_message_when_field_is_missing() {
         try {
-            tc.toList(UserPojo.class, TableParser.parse("" +
+            tc.toList(TableParser.parse("" +
                     "| name        | birthDate  | crapola  |\n" +
                     "| Sid Vicious | 10/05/1957 | 1,000    |\n" +
                     "| Frank Zappa | 21/12/1940 | 3,000    |\n" +
-                    "", PARAMETER_INFO)
-            );
+                    "", PARAMETER_INFO),
+                    UserPojo.class);
             fail();
         } catch (CucumberException e) {
             assertEquals("No such field cucumber.runtime.table.ToDataTableTest$UserPojo.crapola", e.getMessage());
@@ -69,11 +69,12 @@ public class ToDataTableTest {
     @Test
     public void gives_a_nice_error_message_when_primitive_field_is_null() {
         try {
-            tc.toList(PojoWithInt.class, TableParser.parse("" +
+            tc.toList(TableParser.parse("" +
                     "| credits     |\n" +
                     "| 5           |\n" +
                     "|             |\n" +
-                    "", PARAMETER_INFO)
+                    "", PARAMETER_INFO),
+                    PojoWithInt.class
             );
             fail();
         } catch (CucumberException e) {
@@ -84,10 +85,11 @@ public class ToDataTableTest {
     @Test
     public void gives_a_meaningfull_error_message_when_field_is_repeated() {
         try {
-            tc.toList(UserPojo.class, TableParser.parse("" +
+            tc.toList(TableParser.parse("" +
                     "| credits     | credits     |\n" +
                     "| 5           | 5           |\n" +
-                    "", PARAMETER_INFO)
+                    "", PARAMETER_INFO),
+                    UserPojo.class
             );
             fail();
         } catch (CucumberException e) {
@@ -97,7 +99,7 @@ public class ToDataTableTest {
 
     @Test
     public void converts_list_of_beans_to_table_with_explicit_columns() {
-        List<UserPojo> users = tc.toList(UserPojo.class, personTable());
+        List<UserPojo> users = tc.toList(personTable(), UserPojo.class);
         DataTable table = tc.toTable(users, "name", "birthDate", "credits");
         assertEquals("" +
                 "      | name        | birthDate  | credits |\n" +
@@ -108,7 +110,7 @@ public class ToDataTableTest {
 
     @Test
     public void diffs_round_trip() {
-        List<UserPojo> users = tc.toList(UserPojo.class, personTable());
+        List<UserPojo> users = tc.toList(personTable(), UserPojo.class);
         personTable().diff(users);
     }
 
@@ -138,7 +140,7 @@ public class ToDataTableTest {
                 "", table.toString());
         Type listOfDoubleType = new TypeReference<List<Double>>() {
         }.getType();
-        List<List<Double>> actual = tc.toList(listOfDoubleType, table);
+        List<List<Double>> actual = tc.toList(table, listOfDoubleType);
         assertEquals(lists, actual);
     }
 

@@ -6,7 +6,6 @@ import cucumber.runtime.table.DiffableRow;
 import cucumber.runtime.table.TableConverter;
 import cucumber.runtime.table.TableDiffException;
 import cucumber.runtime.table.TableDiffer;
-import cucumber.runtime.table.TypeReference;
 import cucumber.runtime.xstream.LocalizedXStreams;
 import gherkin.formatter.PrettyFormatter;
 import gherkin.formatter.model.DataTableRow;
@@ -88,19 +87,14 @@ public class DataTable {
         return tableConverter.convert(type, this, false);
     }
 
-    public <T> T convert(Type type, boolean transposed) {
-        return tableConverter.convert(type, this, transposed);
-    }
-
     /**
      * Converts the table to a List of Map. The top row is used as keys in the maps,
      * and the rows below are used as values.
      *
      * @return a List of Map.
      */
-    public <K, V> List<Map<K, V>> asMaps() {
-        return asList(new TypeReference<Map<String, String>>() {
-        }.getType());
+    public <K, V> List<Map<K, V>> asMaps(Type keyType, Type valueType) {
+        return tableConverter.toMaps(this, keyType, valueType);
     }
 
     /**
@@ -108,9 +102,8 @@ public class DataTable {
      *
      * @return a Map.
      */
-    public <K, V> Map<K, V> asMap() {
-        return tableConverter.convert(new TypeReference<Map<String, String>>() {
-        }.getType(), this, false);
+    public <K, V> Map<K, V> asMap(Type keyType, Type valueType) {
+        return tableConverter.toMap(this, keyType, valueType);
     }
 
     /**
@@ -120,12 +113,16 @@ public class DataTable {
      * Backends that support generic types can declare a parameter as a List of a type, and Cucumber will
      * do the conversion automatically.
      *
-     * @param type the type of the result (should be a {@link List} generic type)
-     * @param <T>  the type of each object
+     * @param itemType the type of the result (should be a {@link List} generic type)
+     * @param <T>      the type of each object
      * @return a list of objects
      */
-    public <T> List<T> asList(Type type) {
-        return tableConverter.toList(type, this, false);
+    public <T> List<T> asList(Type itemType) {
+        return tableConverter.toList(this, itemType);
+    }
+
+    public <T> List<List<T>> asLists(Type itemType) {
+        return tableConverter.toLists(this, itemType);
     }
 
     public List<String> topCells() {

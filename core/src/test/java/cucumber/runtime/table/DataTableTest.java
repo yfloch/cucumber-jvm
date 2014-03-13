@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -78,12 +79,15 @@ public class DataTableTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void asMaps_is_immutable() {
-        createSimpleTable().asMaps().remove(0);
+        List<Map<String, String>> maps = createSimpleTable().asMaps(String.class, String.class);
+        maps.remove(0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void asMap_is_immutable() {
-        createTable(asList("one", "four"), asList("4444", "55555")).asMap().remove("4444");
+        Map<String, Long> map = createTable(asList("hundred", "100"), asList("thousand", "1000")).asMap(String.class, Long.class);
+        assertEquals(new Long(1000L), map.get("thousand"));
+        map.remove("hundred");
     }
 
     @Test
