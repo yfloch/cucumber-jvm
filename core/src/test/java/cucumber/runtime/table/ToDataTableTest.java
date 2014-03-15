@@ -7,7 +7,6 @@ import cucumber.runtime.xstream.LocalizedXStreams;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,9 +137,7 @@ public class ToDataTableTest {
                 "      | 0.5 | 1.5     |\n" +
                 "      | 99  | 1,000.5 |\n" +
                 "", table.toString());
-        Type listOfDoubleType = new TypeReference<List<Double>>() {
-        }.getType();
-        List<List<Double>> actual = tc.toList(table, listOfDoubleType);
+        List<List<Double>> actual = tc.toLists(table, Double.class);
         assertEquals(lists, actual);
     }
 

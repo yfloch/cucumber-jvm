@@ -17,7 +17,6 @@ import gherkin.formatter.model.Comment;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.util.Mapper;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,11 +47,11 @@ public class TableConverter {
      * This method converts a {@link cucumber.api.DataTable} to abother type.
      * When a Step Definition is passed a Gherkin Data Table, the runtime will use this method to convert the
      * {@link cucumber.api.DataTable} to the declared type before invoking the Step Definition.
-     *
+     * <p/>
      * This method uses reflection to inspect the type and delegates to the appropriate {@code toXxx} method.
      *
-     * @param dataTable the table to convert
-     * @param type the type to convert to
+     * @param dataTable  the table to convert
+     * @param type       the type to convert to
      * @param transposed whether the table should be transposed first.
      * @return the transformed object.
      */
@@ -106,6 +105,7 @@ public class TableConverter {
     private <T> List<T> toListOfComplexType(DataTable dataTable, Class<T> itemType) {
         HierarchicalStreamReader reader = new ListOfComplexTypeReader(itemType, convertTopCellsToFieldNames(dataTable), dataTable.cells(1));
         try {
+            xStream.setParameterInfo(parameterInfo);
             return Collections.unmodifiableList((List<T>) xStream.unmarshal(reader));
         } catch (AbstractReflectionConverter.UnknownFieldException e) {
             throw new CucumberException(e.getShortMessage());
@@ -117,16 +117,22 @@ public class TableConverter {
             } else {
                 throw new CucumberException(e);
             }
+        } finally {
+            xStream.unsetParameterInfo();
         }
     }
 
     public <T> List<T> toList(DataTable dataTable, Type itemType) {
         SingleValueConverter itemConverter = xStream.getSingleValueConverter(itemType);
-        if (itemConverter == null) {
-            //return toListOfComplexType(dataTable, (Class<T>) itemType);
-            return convert(dataTable, new GenericListType(itemType), false);
+        if (itemConverter != null) {
+            return toList(dataTable, itemConverter);
+        } else {
+            if (itemType instanceof Class) {
+                return toListOfComplexType(dataTable, (Class<T>) itemType);
+            } else {
+                throw new CucumberException(String.format("Can't convert DataTable to List<%s>", itemType));
+            }
         }
-        return toList(dataTable, itemConverter);
     }
 
     private <T> List<T> toList(DataTable dataTable, SingleValueConverter itemConverter) {
@@ -283,28 +289,5 @@ public class TableConverter {
             return array.length > 0 && xStream.getSingleValueConverter(array[0].getClass()) != null;
         }
         return false;
-    }
-
-    private static class GenericListType implements ParameterizedType {
-        private final Type type;
-
-        public GenericListType(Type type) {
-            this.type = type;
-        }
-
-        @Override
-        public Type[] getActualTypeArguments() {
-            return new Type[]{type};
-        }
-
-        @Override
-        public Type getRawType() {
-            return List.class;
-        }
-
-        @Override
-        public Type getOwnerType() {
-            throw new UnsupportedOperationException();
-        }
     }
 }
