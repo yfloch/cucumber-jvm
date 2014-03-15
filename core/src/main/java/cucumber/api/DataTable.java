@@ -11,7 +11,6 @@ import gherkin.formatter.PrettyFormatter;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Row;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,8 +74,6 @@ public class DataTable {
     }
 
     /**
-     * Converts the table to a 2D array.
-     *
      * @return a List of List of String.
      */
     public List<List<String>> raw() {
@@ -89,7 +86,7 @@ public class DataTable {
      *
      * @return a List of Map.
      */
-    public <K, V> List<Map<K, V>> asMaps(Type keyType, Type valueType) {
+    public <K, V> List<Map<K, V>> asMaps(Class<K> keyType, Class<V> valueType) {
         return tableConverter.toMaps(this, keyType, valueType);
     }
 
@@ -97,27 +94,36 @@ public class DataTable {
      * Converts the table to a single Map. The left column is used as keys, the right column as values.
      *
      * @return a Map.
+     * @throws cucumber.runtime.CucumberException if the table doesn't have 2 columns.
      */
-    public <K, V> Map<K, V> asMap(Type keyType, Type valueType) {
+    public <K, V> Map<K, V> asMap(Class<K> keyType, Class<V> valueType) {
         return tableConverter.toMap(this, keyType, valueType);
     }
 
     /**
-     * Converts the table to a List of objects. The top row is used to identifies the fields/properties
-     * of the objects.
-     * <p/>
-     * Backends that support generic types can declare a parameter as a List of a type, and Cucumber will
-     * do the conversion automatically.
+     * Converts the table to a List.
      *
-     * @param itemType the type of the result (should be a {@link List} generic type)
-     * @param <T>      the type of each object
-     * @return a list of objects
+     * If {@code itemType} is a scalar type the table is flattened.
+     *
+     * Otherwise, the top row is used to name the fields/properties and the remaining
+     * rows are turned into list items.
+     *
+     * @param itemType the type of the list items
+     * @param <T>      the type of the list items
+     * @return a List of objects
      */
-    public <T> List<T> asList(Type itemType) {
+    public <T> List<T> asList(Class<T> itemType) {
         return tableConverter.toList(this, itemType);
     }
 
-    public <T> List<List<T>> asLists(Type itemType) {
+    /**
+     * Converts the table to a List of List of scalar.
+     *
+     * @param itemType the type of the list items
+     * @param <T>      the type of the list items
+     * @return a List of List of objects
+     */
+    public <T> List<List<T>> asLists(Class<T> itemType) {
         return tableConverter.toLists(this, itemType);
     }
 
@@ -192,16 +198,6 @@ public class DataTable {
 
     public TableConverter getTableConverter() {
         return tableConverter;
-    }
-
-    public List<String> flatten() {
-        List<String> result = new ArrayList<String>();
-        for (List<String> rows : raw()) {
-            for (String cell : rows) {
-                result.add(cell);
-            }
-        }
-        return result;
     }
 
     public DataTable transpose() {

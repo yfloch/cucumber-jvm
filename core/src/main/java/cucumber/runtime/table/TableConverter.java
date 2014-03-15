@@ -7,6 +7,8 @@ import cucumber.deps.com.thoughtworks.xstream.converters.reflection.AbstractRefl
 import cucumber.deps.com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.ParameterInfo;
+import cucumber.runtime.table.CamelCaseStringConverter;
+import cucumber.runtime.table.StringConverter;
 import cucumber.runtime.xstream.CellWriter;
 import cucumber.runtime.xstream.ComplexTypeWriter;
 import cucumber.runtime.xstream.ListOfComplexTypeReader;
@@ -56,49 +58,44 @@ public class TableConverter {
      * @return the transformed object.
      */
     public <T> T convert(DataTable dataTable, Type type, boolean transposed) {
-        try {
-            if (transposed) {
-                dataTable = dataTable.transpose();
-            }
+        if (transposed) {
+            dataTable = dataTable.transpose();
+        }
 
-            xStream.setParameterInfo(parameterInfo);
-            if (type == null || (type instanceof Class && ((Class) type).isAssignableFrom(DataTable.class))) {
-                return (T) dataTable;
-            }
+        if (type == null || (type instanceof Class && ((Class) type).isAssignableFrom(DataTable.class))) {
+            return (T) dataTable;
+        }
 
-            Type mapKeyType = mapKeyType(type);
-            if (mapKeyType != null) {
-                Type mapValueType = mapValueType(type);
-                return (T) toMap(dataTable, mapKeyType, mapValueType);
-            }
+        Type mapKeyType = mapKeyType(type);
+        if (mapKeyType != null) {
+            Type mapValueType = mapValueType(type);
+            return (T) toMap(dataTable, mapKeyType, mapValueType);
+        }
 
-            Type itemType = listItemType(type);
-            if (itemType == null) {
-                throw new CucumberException("Not a Map or List type: " + type);
-            }
+        Type itemType = listItemType(type);
+        if (itemType == null) {
+            throw new CucumberException("Not a Map or List type: " + type);
+        }
 
-            Type listItemType = listItemType(itemType);
-            if (listItemType != null) {
-                return (T) toLists(dataTable, listItemType);
+        Type listItemType = listItemType(itemType);
+        if (listItemType != null) {
+            return (T) toLists(dataTable, listItemType);
+        } else {
+            SingleValueConverter singleValueConverter = xStream.getSingleValueConverter(itemType);
+            if (singleValueConverter != null) {
+                return (T) toList(dataTable, singleValueConverter);
             } else {
-                SingleValueConverter singleValueConverter = xStream.getSingleValueConverter(itemType);
-                if (singleValueConverter != null) {
-                    return (T) toList(dataTable, singleValueConverter);
-                } else {
-                    if (itemType instanceof Class) {
-                        if (Map.class.equals(itemType)) {
-                            // Non-generic map
-                            return (T) toMaps(dataTable, String.class, String.class);
-                        } else {
-                            return (T) toListOfComplexType(dataTable, (Class) itemType);
-                        }
+                if (itemType instanceof Class) {
+                    if (Map.class.equals(itemType)) {
+                        // Non-generic map
+                        return (T) toMaps(dataTable, String.class, String.class);
                     } else {
-                        return (T) toMaps(dataTable, mapKeyType(itemType), mapValueType(itemType));
+                        return (T) toListOfComplexType(dataTable, (Class) itemType);
                     }
+                } else {
+                    return (T) toMaps(dataTable, mapKeyType(itemType), mapValueType(itemType));
                 }
             }
-        } finally {
-            xStream.unsetParameterInfo();
         }
     }
 
@@ -137,76 +134,92 @@ public class TableConverter {
 
     private <T> List<T> toList(DataTable dataTable, SingleValueConverter itemConverter) {
         List<T> result = new ArrayList<T>();
-        for (String cell : dataTable.flatten()) {
-            result.add((T) itemConverter.fromString(cell));
+
+        for (List<String> row : dataTable.raw()) {
+            for (String cell : row) {
+                result.add((T) itemConverter.fromString(cell));
+            }
         }
         return Collections.unmodifiableList(result);
     }
 
     public <T> List<List<T>> toLists(DataTable dataTable, Type itemType) {
-        SingleValueConverter itemConverter = xStream.getSingleValueConverter(itemType);
-        if (itemConverter == null) {
-            throw new CucumberException(String.format("Can't convert DataTable to List<List<%s>>", itemType));
-        }
-
-        List<List<T>> result = new ArrayList<List<T>>();
-        for (List<String> row : dataTable.raw()) {
-            List<T> convertedRow = new ArrayList<T>();
-            for (String cell : row) {
-                convertedRow.add((T) itemConverter.fromString(cell));
+        try {
+            xStream.setParameterInfo(parameterInfo);
+            SingleValueConverter itemConverter = xStream.getSingleValueConverter(itemType);
+            if (itemConverter == null) {
+                throw new CucumberException(String.format("Can't convert DataTable to List<List<%s>>", itemType));
             }
-            result.add(Collections.unmodifiableList(convertedRow));
+
+            List<List<T>> result = new ArrayList<List<T>>();
+            for (List<String> row : dataTable.raw()) {
+                List<T> convertedRow = new ArrayList<T>();
+                for (String cell : row) {
+                    convertedRow.add((T) itemConverter.fromString(cell));
+                }
+                result.add(Collections.unmodifiableList(convertedRow));
+            }
+            return Collections.unmodifiableList(result);
+        } finally {
+            xStream.unsetParameterInfo();
         }
-        return Collections.unmodifiableList(result);
     }
 
     public <K, V> Map<K, V> toMap(DataTable dataTable, Type keyType, Type valueType) {
-        SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
-        SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
+        try {
+            xStream.setParameterInfo(parameterInfo);
+            SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
+            SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
 
-        if (keyConverter == null || valueConverter == null) {
-            throw new CucumberException(String.format("Can't convert DataTable to Map<%s,%s>", keyType, valueType));
-        }
-
-        Map<K, V> result = new HashMap<K, V>();
-        for (List<String> row : dataTable.raw()) {
-            if (row.size() != 2) {
-                throw new CucumberException("A DataTable can only be converted to a Map when there are 2 columns");
+            if (keyConverter == null || valueConverter == null) {
+                throw new CucumberException(String.format("Can't convert DataTable to Map<%s,%s>", keyType, valueType));
             }
-            K key = (K) keyConverter.fromString(row.get(0));
-            V value = (V) valueConverter.fromString(row.get(1));
-            result.put(key, value);
+
+            Map<K, V> result = new HashMap<K, V>();
+            for (List<String> row : dataTable.raw()) {
+                if (row.size() != 2) {
+                    throw new CucumberException("A DataTable can only be converted to a Map when there are 2 columns");
+                }
+                K key = (K) keyConverter.fromString(row.get(0));
+                V value = (V) valueConverter.fromString(row.get(1));
+                result.put(key, value);
+            }
+            return Collections.unmodifiableMap(result);
+        } finally {
+            xStream.unsetParameterInfo();
         }
-        return Collections.unmodifiableMap(result);
     }
 
     public <K, V> List<Map<K, V>> toMaps(DataTable dataTable, Type keyType, Type valueType) {
-        xStream.setParameterInfo(parameterInfo);
+        try {
+            xStream.setParameterInfo(parameterInfo);
+            SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
+            SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
 
-        SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
-        SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
-
-        if (keyConverter == null || valueConverter == null) {
-            throw new CucumberException(String.format("Can't convert DataTable to List<Map<%s,%s>>", keyType, valueType));
-        }
-
-        List<Map<K, V>> result = new ArrayList<Map<K, V>>();
-        List<String> keyStrings = dataTable.topCells();
-        List<K> keys = new ArrayList<K>();
-        for (String keyString : keyStrings) {
-            keys.add((K) keyConverter.fromString(keyString));
-        }
-        List<List<String>> valueRows = dataTable.cells(1);
-        for (List<String> valueRow : valueRows) {
-            Map<K, V> map = new HashMap<K, V>();
-            int i = 0;
-            for (String cell : valueRow) {
-                map.put(keys.get(i), (V) valueConverter.fromString(cell));
-                i++;
+            if (keyConverter == null || valueConverter == null) {
+                throw new CucumberException(String.format("Can't convert DataTable to List<Map<%s,%s>>", keyType, valueType));
             }
-            result.add(Collections.unmodifiableMap(map));
+
+            List<Map<K, V>> result = new ArrayList<Map<K, V>>();
+            List<String> keyStrings = dataTable.topCells();
+            List<K> keys = new ArrayList<K>();
+            for (String keyString : keyStrings) {
+                keys.add((K) keyConverter.fromString(keyString));
+            }
+            List<List<String>> valueRows = dataTable.cells(1);
+            for (List<String> valueRow : valueRows) {
+                Map<K, V> map = new HashMap<K, V>();
+                int i = 0;
+                for (String cell : valueRow) {
+                    map.put(keys.get(i), (V) valueConverter.fromString(cell));
+                    i++;
+                }
+                result.add(Collections.unmodifiableMap(map));
+            }
+            return Collections.unmodifiableList(result);
+        } finally {
+            xStream.unsetParameterInfo();
         }
-        return Collections.unmodifiableList(result);
     }
 
     /**

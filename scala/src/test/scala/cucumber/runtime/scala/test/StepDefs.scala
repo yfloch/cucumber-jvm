@@ -127,7 +127,7 @@ class CukesStepDefinitions extends ScalaDsl with EN {
   }
 
   Given("""^I have a table the sum of all rows should be (\d+) :$"""){ (value:Int, table:DataTable) =>
-    assertEquals(value, table.flatten.drop(1).map(_.toInt).foldLeft(0)(_+_))
+    assertEquals(value, table.asList(classOf[String]).drop(1).map(_.toInt).foldLeft(0)(_+_))
   }
 
   var snake:Snake = null
