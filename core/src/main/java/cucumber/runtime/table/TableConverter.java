@@ -44,13 +44,25 @@ public class TableConverter {
         this.parameterInfo = parameterInfo;
     }
 
-    public <T> T convert(Type type, DataTable dataTable, boolean transposed) {
+    /**
+     * This method converts a {@link cucumber.api.DataTable} to abother type.
+     * When a Step Definition is passed a Gherkin Data Table, the runtime will use this method to convert the
+     * {@link cucumber.api.DataTable} to the declared type before invoking the Step Definition.
+     *
+     * This method uses reflection to inspect the type and delegates to the appropriate {@code toXxx} method.
+     *
+     * @param dataTable the table to convert
+     * @param type the type to convert to
+     * @param transposed whether the table should be transposed first.
+     * @return the transformed object.
+     */
+    public <T> T convert(DataTable dataTable, Type type, boolean transposed) {
         try {
             if (transposed) {
                 dataTable = dataTable.transpose();
             }
 
-            xStream.setParameterType(parameterInfo);
+            xStream.setParameterInfo(parameterInfo);
             if (type == null || (type instanceof Class && ((Class) type).isAssignableFrom(DataTable.class))) {
                 return (T) dataTable;
             }
@@ -67,7 +79,9 @@ public class TableConverter {
             }
 
             Type listItemType = listItemType(itemType);
-            if (listItemType == null) {
+            if (listItemType != null) {
+                return (T) toLists(dataTable, listItemType);
+            } else {
                 SingleValueConverter singleValueConverter = xStream.getSingleValueConverter(itemType);
                 if (singleValueConverter != null) {
                     return (T) toList(dataTable, singleValueConverter);
@@ -83,9 +97,6 @@ public class TableConverter {
                         return (T) toMaps(dataTable, mapKeyType(itemType), mapValueType(itemType));
                     }
                 }
-            } else {
-                // List<List<Something>>
-                return (T) toLists(dataTable, listItemType);
             }
         } finally {
             xStream.unsetParameterInfo();
@@ -111,15 +122,14 @@ public class TableConverter {
 
     public <T> List<T> toList(DataTable dataTable, Type itemType) {
         SingleValueConverter itemConverter = xStream.getSingleValueConverter(itemType);
-        if(itemConverter == null) {
+        if (itemConverter == null) {
             //return toListOfComplexType(dataTable, (Class<T>) itemType);
-            return convert(new GenericListType(itemType), dataTable, false);
+            return convert(dataTable, new GenericListType(itemType), false);
         }
         return toList(dataTable, itemConverter);
     }
 
     private <T> List<T> toList(DataTable dataTable, SingleValueConverter itemConverter) {
-
         List<T> result = new ArrayList<T>();
         for (String cell : dataTable.flatten()) {
             result.add((T) itemConverter.fromString(cell));
@@ -129,7 +139,7 @@ public class TableConverter {
 
     public <T> List<List<T>> toLists(DataTable dataTable, Type itemType) {
         SingleValueConverter itemConverter = xStream.getSingleValueConverter(itemType);
-        if(itemConverter == null) {
+        if (itemConverter == null) {
             throw new CucumberException(String.format("Can't convert DataTable to List<List<%s>>", itemType));
         }
 
@@ -144,7 +154,7 @@ public class TableConverter {
         return Collections.unmodifiableList(result);
     }
 
-    public <K, V> Map<K, V>  toMap(DataTable dataTable, Type keyType, Type valueType) {
+    public <K, V> Map<K, V> toMap(DataTable dataTable, Type keyType, Type valueType) {
         SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
         SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
 
@@ -165,6 +175,8 @@ public class TableConverter {
     }
 
     public <K, V> List<Map<K, V>> toMaps(DataTable dataTable, Type keyType, Type valueType) {
+        xStream.setParameterInfo(parameterInfo);
+
         SingleValueConverter keyConverter = xStream.getSingleValueConverter(keyType);
         SingleValueConverter valueConverter = xStream.getSingleValueConverter(valueType);
 
@@ -200,7 +212,7 @@ public class TableConverter {
      */
     public DataTable toTable(List<?> objects, String... columnNames) {
         try {
-            xStream.setParameterType(parameterInfo);
+            xStream.setParameterInfo(parameterInfo);
 
             List<String> header = null;
             List<List<String>> valuesList = new ArrayList<List<String>>();

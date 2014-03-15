@@ -83,10 +83,6 @@ public class DataTable {
         return this.raw;
     }
 
-    public <T> T convert(Type type) {
-        return tableConverter.convert(type, this, false);
-    }
-
     /**
      * Converts the table to a List of Map. The top row is used as keys in the maps,
      * and the rows below are used as values.

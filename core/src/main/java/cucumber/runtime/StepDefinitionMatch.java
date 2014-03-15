@@ -92,7 +92,7 @@ public class StepDefinitionMatch extends Match {
         TableConverter tableConverter = new TableConverter(xStream, parameterInfo);
         DataTable table = new DataTable(step.getRows(), tableConverter);
         Type type = parameterInfo.getType();
-        return tableConverter.convert(type, table, parameterInfo.isTransposed());
+        return tableConverter.convert(table, type, parameterInfo.isTransposed());
     }
 
     private CucumberException arityMismatch(int parameterCount) {
