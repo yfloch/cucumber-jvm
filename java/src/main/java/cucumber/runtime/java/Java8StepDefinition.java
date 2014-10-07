@@ -20,6 +20,7 @@ public class Java8StepDefinition implements StepDefinition {
     private final Pattern pattern;
     private final long timeoutMillis;
     private final StepdefBody body;
+    private final ObjectFactory objectFactory;
 
     private final JdkPatternArgumentMatcher argumentMatcher;
     private final StackTraceElement location;
@@ -27,9 +28,10 @@ public class Java8StepDefinition implements StepDefinition {
     private final List<ParameterInfo> parameterInfos;
     private final Method method;
 
-    public Java8StepDefinition(Pattern pattern, long timeoutMillis, StepdefBody body, TypeIntrospector typeIntrospector) throws Exception {
+    public Java8StepDefinition(Pattern pattern, long timeoutMillis, ObjectFactory objectFactory, StepdefBody body, TypeIntrospector typeIntrospector) throws Exception {
         this.pattern = pattern;
         this.timeoutMillis = timeoutMillis;
+        this.objectFactory = objectFactory;
         this.body = body;
 
         this.argumentMatcher = new JdkPatternArgumentMatcher(pattern);

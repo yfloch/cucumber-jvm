@@ -87,11 +87,11 @@ public class PluginFactory {
         for (Class ctorArgClass : CTOR_ARGS) {
             Constructor<T> constructor = findConstructor(pluginClass, ctorArgClass);
             if (constructor != null) {
-                Object ctorArg = convertOrNull(pathOrUrl, ctorArgClass, pluginString);
                 try {
                     if (ctorArgClass == null) {
                         return constructor.newInstance();
                     } else {
+                        Object ctorArg = convertOrNull(pathOrUrl, ctorArgClass, pluginString);
                         if (ctorArg == null) {
                             throw new CucumberException(String.format("You must supply an output argument to %s. Like so: %s:output", pluginString, pluginString));
                         }

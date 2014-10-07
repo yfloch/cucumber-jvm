@@ -42,8 +42,6 @@ public class JavaBackend implements Backend {
 
     /**
      * The constructor called by reflection by default.
-     *
-     * @param resourceLoader
      */
     public JavaBackend(ResourceLoader resourceLoader) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -156,7 +154,7 @@ public class JavaBackend implements Backend {
 
     public void addStepDefinition(String regexp, long timeoutMillis, StepdefBody body, TypeIntrospector typeIntrospector) {
         try {
-            glue.addStepDefinition(new Java8StepDefinition(Pattern.compile(regexp), timeoutMillis, body, typeIntrospector));
+            glue.addStepDefinition(new Java8StepDefinition(Pattern.compile(regexp), timeoutMillis, objectFactory, body, typeIntrospector));
         } catch (Exception e) {
             throw new CucumberException(e);
         }
