@@ -3,4 +3,4 @@ Feature: Java8
     Given I have 42 cukes in my belly
 
   Scenario: another scenario which should have isloated state
-    Given I have 43 cukes in my belly
+    Given I have 42 cukes in my belly

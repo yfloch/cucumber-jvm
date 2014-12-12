@@ -64,4 +64,9 @@ class JavaStepDefinition implements StepDefinition {
     public String getPattern() {
         return pattern.pattern();
     }
+
+    @Override
+    public boolean isScenarioScoped() {
+        return false;
+    }
 }

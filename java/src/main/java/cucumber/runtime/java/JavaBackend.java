@@ -25,6 +25,7 @@ import gherkin.formatter.model.Step;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -39,6 +40,7 @@ public class JavaBackend implements Backend {
 
     private final MethodScanner methodScanner;
     private Glue glue;
+    private List<Class<? extends GlueBase>> glueBaseClasses = new ArrayList<Class<? extends GlueBase>>();
 
     /**
      * The constructor called by reflection by default.
@@ -66,7 +68,7 @@ public class JavaBackend implements Backend {
         methodScanner = new MethodScanner(classFinder);
     }
 
-    public static ObjectFactory loadObjectFactory(ClassFinder classFinder) {
+    private static ObjectFactory loadObjectFactory(ClassFinder classFinder) {
         ObjectFactory objectFactory;
         try {
             Reflections reflections = new Reflections(classFinder);
@@ -95,18 +97,8 @@ public class JavaBackend implements Backend {
                 }
 
                 objectFactory.addClass(glueClass);
+                glueBaseClasses.add(glueClass);
             }
-            INSTANCE.set(this);
-            try {
-                for (Class<? extends GlueBase> glueDefinerClass : glueDefinerClasses) {
-                    objectFactory.getInstance(glueDefinerClass).defineGlue();
-                }
-            } catch (Exception e) {
-                throw new CucumberException("Failed to instantiate Java8 glue", e);
-            } finally {
-                INSTANCE.remove();
-            }
-
         }
     }
 
@@ -131,6 +123,19 @@ public class JavaBackend implements Backend {
     @Override
     public void buildWorld() {
         objectFactory.start();
+
+        // Instantiate all the stepdef classes for java8 - the stepdef will be initialised
+        // in the constructor.
+        try {
+            INSTANCE.set(this);
+            glue.removeScenarioScopedGlue();
+            for (Class<? extends GlueBase> glueBaseClass : glueBaseClasses) {
+                GlueBase instance = objectFactory.getInstance(glueBaseClass);
+                System.out.println("instance = " + instance);
+            }
+        } finally {
+            INSTANCE.remove();
+        }
     }
 
     @Override

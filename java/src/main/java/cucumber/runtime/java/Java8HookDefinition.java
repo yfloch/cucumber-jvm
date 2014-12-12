@@ -67,4 +67,9 @@ public class Java8HookDefinition implements HookDefinition {
     public int getOrder() {
         return order;
     }
+
+    @Override
+    public boolean isScenarioScoped() {
+        return true;
+    }
 }

@@ -9,8 +9,7 @@ import static org.junit.Assert.assertNotSame;
 public class LambdaStepdefs implements En {
     private static LambdaStepdefs lastInstance;
 
-    @Override
-    public void defineGlue() {
+    public LambdaStepdefs() {
         Before((Scenario scenario) -> {
             assertNotSame(this, lastInstance);
             lastInstance = this;

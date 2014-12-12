@@ -69,4 +69,8 @@ class JavaHookDefinition implements HookDefinition {
         return order;
     }
 
+    @Override
+    public boolean isScenarioScoped() {
+        return false;
+    }
 }
